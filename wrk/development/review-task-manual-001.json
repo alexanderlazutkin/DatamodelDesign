@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "task_id": "R-manual-001",
+  "mode": "standard_review",
+  "purpose": "Ручное испытание протокола рецензирования (шаг А1 плана автоматизации) на синтетическом фрагменте до реализации помощника. Проверяется работоспособность артефактов и порядка, а не качество стандарта.",
+  "scope": "Синтетический учебный фрагмент «Именование и идентификация объектов ЛМД» (tests/fixtures/demo-standard-fragment.md), редакция 0.1.",
+  "exclusions": "Реальные материалы src/; проверка соответствия моделей (контуры P/C); RAG; применение правок к рабочим файлам.",
+  "inputs": ["tests/fixtures/demo-standard-fragment.md"],
+  "allowed_candidate_paths": ["tests/fixtures/demo-standard-fragment.md"],
+  "checklist_path": "tools/review-assets/checklist-standard.json",
+  "roles": {
+    "reviewer": "reviewer — отдельная сессия рецензента (инструкция tools/review-assets/reviewer.md); модель фиксируется в отчёте рецензента",
+    "editor": "editor — основная сессия автора (инструкция tools/review-assets/editor.md)",
+    "decision_maker": "lan (пользователь, интерактивно)",
+    "assistant": "ручной проход без кода (А1); автоматизация появится на А2"
+  },
+  "environment": {
+    "llm_profile": "opencode",
+    "provider_model": "reviewer: отдельная сессия субагента (read-only), модель указывается в отчёте; editor: GLM (zai-coding-plan/glm-5.3)",
+    "notes": "Технический read-only на уровне среды НЕ обеспечивается. Рецензент запускается в отдельной сессии субагента без пишущих инструментов; целостность входов контролируется сравнением SHA-256 до и после прохода. Инструкция рецензента самодостаточна, модель сменяема повторным запуском роли в другой оболочке. Сеть не используется."
+  },
+  "max_rounds": 2
+}

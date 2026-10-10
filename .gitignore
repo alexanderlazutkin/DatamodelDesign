@@ -1,0 +1,32 @@
+# Локальные архивы: не входят в действующий комплект; файлы не удаляются.
+/trash/
+
+# Временные снимки и сырые результаты. Принятые записи — wrk/review-records/.
+/wrk/review-runs/
+/wrk/tmp/
+
+# Окружения и кэши инструментов.
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+node_modules/
+.coverage
+htmlcov/
+
+# Локальные ключи и настройки с секретами.
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Служебные файлы редакторов и операционной системы.
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+~$*

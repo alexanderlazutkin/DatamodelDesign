@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "task_id": "R-demo-001",
+  "mode": "standard_review",
+  "purpose": "Демонстрационный запуск контура R через локального помощника (шаг А3 плана автоматизации) на фиксированной синтетической базе. Повторение ручного прохода А1 автоматизированными средствами; проверяется повторяемость обнаружения заведомо внесённых дефектов.",
+  "scope": "Синтетический учебный фрагмент «Именование и идентификация объектов ЛМД» (tests/fixtures/demo-standard-fragment.md), редакция 0.1, та же база, что в ручном проходе manual-001.",
+  "exclusions": "Реальные материалы src/; проверка соответствия моделей (контуры P/C); RAG; применение правок к рабочим файлам; коммит и публикация.",
+  "inputs": ["tests/fixtures/demo-standard-fragment.md"],
+  "allowed_candidate_paths": ["tests/fixtures/demo-standard-fragment.md"],
+  "checklist_path": "tools/review-assets/checklist-standard.json",
+  "roles": {
+    "reviewer": "reviewer — отдельная сессия рецензента (инструкция tools/review-assets/reviewer.md); модель фиксируется в отчёте рецензента",
+    "editor": "editor — основная сессия автора (инструкция tools/review-assets/editor.md)",
+    "decision_maker": "lan (пользователь, интерактивно)",
+    "assistant": "tools/review.py (версия фиксируется в манифесте запуска)"
+  },
+  "environment": {
+    "llm_profile": "opencode",
+    "provider_model": "reviewer: cherry/agent/deepseek-v4-pro (проектный агент reviewer, read-only, провайдер Cherry); альтернативное мнение: cherry/openai/gpt-6-astra (агент reviewer-alt); editor: GLM (zai-coding-plan/glm-5.3)",
+    "notes": "Технический read-only на уровне среды НЕ обеспечивается. Рецензент — отдельная read-only сессия субагента без пишущих инструментов; целостность входов контролируется помощником по SHA-256. Инструкция рецензента самодостаточна, модель сменяема повторным запуском роли (правка model: в .opencode/agent/reviewer*.md + перезапуск opencode). Сеть не используется; помощник не вызывает LLM API, Git-мутации и произвольный shell."
+  },
+  "max_rounds": 2
+}
