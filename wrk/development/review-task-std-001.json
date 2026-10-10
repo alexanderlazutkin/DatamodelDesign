@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "task_id": "R-std-001",
+  "mode": "standard_review",
+  "purpose": "Рецензирование первой рабочей редакции разделов «Контроль документа», 1–3 Стандарта (0.1-д1) и начального словаря T-xxx до дальнейшего наполнения (Д2–Д3). Проверяется соответствие каркасу v0.8 (С01), решениям Д1 (Р-010), терминология по С04 и отсутствие скрытых усилений.",
+  "scope": "wrk/standard/Стандарт.md (разделы «Контроль документа», 1–3) и wrk/standard/registry/terms-draft.md вместе с проверочной базой С01–С05 (src/).",
+  "exclusions": "Разделы 4–12 и приложения (наполняются на Д2–Д7); реестр требований (схема — Д2); управляющие документы (план 0.4, реестр решений) — только как контекст ссылок; применение правок к рабочим файлам.",
+  "inputs": [
+    "wrk/standard/Стандарт.md",
+    "wrk/standard/registry/terms-draft.md",
+    "src/Структура стандарта проектирования моделей данных ЛМД и КМД.md",
+    "src/Требования к КМД.md",
+    "src/Требования к ЛМД.md",
+    "src/Глоссарий (КМД, ЛМД).md",
+    "src/Руководство по EER.md"
+  ],
+  "allowed_candidate_paths": [
+    "wrk/standard/Стандарт.md",
+    "wrk/standard/registry/terms-draft.md"
+  ],
+  "checklist_path": "tools/review-assets/checklist-standard.json",
+  "roles": {
+    "reviewer": "reviewer — субагент read-only, инструкция tools/review-assets/reviewer.md, модель cherry/agent/deepseek-v4-pro",
+    "editor": "editor — основная сессия OpenCode (GLM, zai-coding-plan/glm-5.3)",
+    "decision_maker": "lan (пользователь, интерактивно)",
+    "assistant": "tools/review.py (А2)"
+  },
+  "environment": {
+    "llm_profile": "opencode",
+    "provider_model": "reviewer: cherry/agent/deepseek-v4-pro; editor: GLM (zai-coding-plan/glm-5.3)",
+    "notes": "Технический read-only на уровне среды НЕ обеспечивается; рецензент — субагент без пишущих инструментов. Целостность входов контролируется сравнением SHA-256. Сеть не используется."
+  },
+  "max_rounds": 2
+}
