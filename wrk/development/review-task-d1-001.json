@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "task_id": "R-d1-001",
+  "mode": "standard_review",
+  "purpose": "Первый содержательный прогон контура R (Д1): рецензирование материалов решений ПВ-02 (профили ЛМД и модальность переноса), ПВ-04 (определения и EER-легенда), ПВ-08 (ИОД в объёме пилота) до их утверждения методологом/ИБ. Проверяется соответствие анализа первоисточникам, корректность предложений и прослеживаемость.",
+  "scope": "Три рабочих материала Д1 (wrk/development/Д1 ПВ-02/04/08, v0.1) вместе с проверочной базой: С01 v0.8, С02, С03, С04, С05 (src/). Рабочие документы процесса, не нормативный текст стандарта.",
+  "exclusions": "Управляющие документы (план 0.4, реестр решений) проверяются только как контекст ссылок; src/ не редактируется; проверка соответствия моделей (контуры P/C); применение правок к рабочим файлам.",
+  "inputs": [
+    "wrk/development/Д1 ПВ-02 Профили ЛМД и модальность переноса.md",
+    "wrk/development/Д1 ПВ-04 Определения и EER-легенда.md",
+    "wrk/development/Д1 ПВ-08 ИОД в объёме пилота.md",
+    "src/Структура стандарта проектирования моделей данных ЛМД и КМД.md",
+    "src/Требования к КМД.md",
+    "src/Требования к ЛМД.md",
+    "src/Глоссарий (КМД, ЛМД).md",
+    "src/Руководство по EER.md"
+  ],
+  "allowed_candidate_paths": [
+    "wrk/development/Д1 ПВ-02 Профили ЛМД и модальность переноса.md",
+    "wrk/development/Д1 ПВ-04 Определения и EER-легенда.md",
+    "wrk/development/Д1 ПВ-08 ИОД в объёме пилота.md"
+  ],
+  "checklist_path": "tools/review-assets/checklist-standard.json",
+  "roles": {
+    "reviewer": "reviewer — субагент read-only, инструкция tools/review-assets/reviewer.md, модель cherry/agent/deepseek-v4-pro",
+    "editor": "editor — основная сессия OpenCode (GLM, zai-coding-plan/glm-5.3), инструкция tools/review-assets/editor.md",
+    "decision_maker": "lan (пользователь, интерактивно)",
+    "assistant": "tools/review.py (А2)"
+  },
+  "environment": {
+    "llm_profile": "opencode",
+    "provider_model": "reviewer: cherry/agent/deepseek-v4-pro; editor: GLM (zai-coding-plan/glm-5.3)",
+    "notes": "Технический read-only на уровне среды НЕ обеспечивается; рецензент — субагент без пишущих инструментов. Целостность входов контролируется сравнением SHA-256 до и после прохода. Сеть не используется."
+  },
+  "max_rounds": 2
+}
