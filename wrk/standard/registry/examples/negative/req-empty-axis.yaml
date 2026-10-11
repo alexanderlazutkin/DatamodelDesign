@@ -1,0 +1,9 @@
+# Отрицательный пример: пустой список значений оси не используется (прил. А).
+schema_version: 1
+id: LDM-098
+revision: 1
+formulation: Формулировка требования.
+modality: required
+applies_to:
+  level: []
+status: draft

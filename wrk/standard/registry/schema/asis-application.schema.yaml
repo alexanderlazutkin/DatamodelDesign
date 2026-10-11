@@ -1,0 +1,90 @@
+# Схема строки матрицы применения требований AS-IS (С01 1.8, прил. А; ПВ-03, Д2)
+# Матрица — в составе регламента AS-IS (Д7); схема записи хранится вместе со схемой
+# требований. Матрица не содержит результатов проверки моделей — записи проверки
+# ведутся отдельно (verification.schema.yaml).
+#
+# Правила (прил. А):
+#  - для каждого требования заявленного выпуска: способ применения, ссылка на
+#    адаптированное/специальное требование (при unchanged отсутствует), обоснование
+#    различия, критерий проверки в AS-IS;
+#  - типы связей: applies_as_is (одинаковое обязательство, один ID в обоих
+#    документах) | adapts_for_mode (разные обязательства, отдельные ID);
+#  - replaces для режимных связей НЕ применяется (С01 v0.8, история 0.8) —
+#    в перечне типов связей отсутствует и отвергается схемой;
+#  - спец-требования AS-IS без целевого аналога ведутся в едином реестре
+#    с применимостью mode: [as-is] — в матрицу не включаются.
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: https://std.local/registry/asis-application-1.schema.yaml
+title: Строка матрицы применения требований AS-IS
+type: object
+additionalProperties: false
+required: [schema_version, record, standard_release, requirement, way]
+properties:
+  schema_version:
+    const: 1
+  record:
+    const: asis_application
+  standard_release:
+    # выпуск стандарта, к которому относится строка матрицы; выпуск регламента AS-IS
+    # ссылается на выпуск стандарта через манифест и действителен только с ним
+    type: string
+    minLength: 1
+  requirement:
+    # требование заявленного выпуска стандарта
+    type: object
+    additionalProperties: false
+    required: [id, revision]
+    properties:
+      id: {type: string, pattern: '^(GEN|CDM|LDM)-[0-9]{3,4}$'}
+      revision: {type: integer, minimum: 1}
+  way:
+    # unchanged — без изменения | adapted — адаптировано | not_applied — не применяется
+    enum: [unchanged, adapted, not_applied]
+  relation_type:
+    enum: [applies_as_is, adapts_for_mode]
+  linked:
+    # ссылка на адаптированное или специальное требование AS-IS; при unchanged отсутствует
+    type: object
+    additionalProperties: false
+    required: [id, revision]
+    properties:
+      id: {type: string, pattern: '^(GEN|CDM|LDM)-[0-9]{3,4}$'}
+      revision: {type: integer, minimum: 1}
+  rationale:
+    # обоснование различия (обязательно при adapted и not_applied)
+    type: string
+    minLength: 1
+  as_is_criterion:
+    # критерий проверки в AS-IS (может отличаться от verify.criterion требования)
+    type: string
+    minLength: 1
+
+allOf:
+  # Согласование способа применения и типа режимной связи (детерминированные пары):
+  #  unchanged ↔ applies_as_is (ссылки нет) | adapted ↔ adapts_for_mode (ссылка +
+  #  обоснование обязательны) | not_applied ↔ связи нет (обоснование обязательно).
+  - if:
+      properties:
+        way: {const: unchanged}
+    then:
+      properties:
+        relation_type: {const: applies_as_is}
+      required: [relation_type]
+      not:
+        required: [linked]
+  - if:
+      properties:
+        way: {const: adapted}
+    then:
+      properties:
+        relation_type: {const: adapts_for_mode}
+      required: [relation_type, linked, rationale]
+  - if:
+      properties:
+        way: {const: not_applied}
+    then:
+      required: [rationale]
+      not:
+        anyOf:
+          - required: [relation_type]
+          - required: [linked]

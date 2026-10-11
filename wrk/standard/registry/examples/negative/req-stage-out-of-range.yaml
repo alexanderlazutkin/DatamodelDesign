@@ -1,0 +1,10 @@
+# Отрицательный пример: ось stage — только классификатор 4.2 С01 (1–8);
+# исходные этапы 1–6 и этапы Д0–Д8 в реестр не переносятся (Б2).
+schema_version: 1
+id: GEN-096
+revision: 1
+formulation: Формулировка требования.
+modality: recommended
+applies_to:
+  stage: [9]
+status: draft

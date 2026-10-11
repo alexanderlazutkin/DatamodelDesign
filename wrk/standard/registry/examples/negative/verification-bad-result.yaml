@@ -1,0 +1,16 @@
+# Отрицательный пример: not_applied без обоснования; результат проверки —
+# закрытый перечень (verified | failed | not_applicable | not_checked | insufficient),
+# «passed» в нём нет.
+schema_version: 1
+record: verification
+id: V-000124
+requirement: {id: CDM-015, revision: 1}
+standard_release: "0.2"
+procedure: {id: PR-001, version: 1}
+scope: model
+object: {model: M-042, version: 5}
+result: passed
+checked_by:
+  initiator: тест
+  executor: тест
+  date: "2026-10-11"

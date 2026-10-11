@@ -1,0 +1,202 @@
+# Схема записи требования (прил. А С01 v0.8; ПВ-03, этап Д2)
+# Форма: JSON Schema draft 2020-12, носитель YAML (решение Д2, Р-012).
+# Комментарии в схеме — для рецензентов; валидатор их игнорирует.
+#
+# Семантика применимости (прил. А «Семантика применимости»):
+#  - отсутствие оси — «применимо ко всем» значениям оси;
+#  - значение "undefined" — явная неопределённость, только для черновика
+#    (status: draft) и только единственным значением оси;
+#  - несколько значений оси — дизъюнкция; несколько осей — конъюнкция;
+#  - пустой список значений оси не используется.
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: https://std.local/registry/requirement-1.schema.yaml
+title: Запись требования реестра (прил. А)
+type: object
+additionalProperties: false
+required: [schema_version, id, revision, formulation, modality, status]
+properties:
+  schema_version:
+    const: 1
+  id:
+    # GEN — общие; CDM/LDM — уровни модели; спец-требования AS-IS — в том же пространстве
+    type: string
+    pattern: '^(GEN|CDM|LDM)-[0-9]{3,4}$'
+  revision:
+    # редакция требования (С01 3.9); принадлежность выпускам — манифестом, не полем
+    type: integer
+    minimum: 1
+  formulation:
+    # формулировка — мастер-текст (С01 3.11); редактируется только здесь
+    type: string
+    minLength: 1
+  modality:
+    # Соответствие кодов модальности — С01 3.6 и таблица Б5 (ПВ-13)
+    enum: [required, forbidden, recommended, allowed]
+  applies_to:
+    type: object
+    additionalProperties: false
+    properties:
+      level:
+        $ref: '#/$defs/axis'
+        items:
+          anyOf:
+            - enum: [CDM, LDM]
+            - const: undefined
+      profile:
+        # перечень профилей утверждается прил. Б (Д7); схема перечень не замораживает
+        $ref: '#/$defs/axis'
+        items:
+          anyOf:
+            - type: string
+              pattern: '^[a-z][a-z0-9-]*$'
+            - const: undefined
+      mode:
+        $ref: '#/$defs/axis'
+        items:
+          anyOf:
+            - enum: [to-be, as-is]
+            - const: undefined
+      stage:
+        # классификатор этапов 4.2 С01 (1–8); не хронология (4.3)
+        $ref: '#/$defs/axis'
+        items:
+          anyOf:
+            - type: integer
+              minimum: 1
+              maximum: 8
+            - const: undefined
+  conditions:
+    # условия, не выражаемые осями (конъюнкция); условная применимость — сюда, не в модальность
+    type: array
+    items: {type: string, minLength: 1}
+    default: []
+  exception_allowed:
+    # связь с процедурой исключений (С01 3.8)
+    type: boolean
+    default: true
+  verify:
+    type: object
+    additionalProperties: false
+    required: [kind, criterion]
+    properties:
+      kind:
+        # вид проверки из С01 10.1; закрытый перечень фиксируется при наполнении прил. Ж (Д7)
+        type: string
+        minLength: 1
+      criterion:
+        # критерий выполнения (тестируемость — С01 3.10)
+        type: string
+        minLength: 1
+      procedure:
+        # контрольная процедура (прил. Ж); до наполнения прил. Ж — null
+        oneOf:
+          - type: 'null'
+          - type: string
+            pattern: '^PR-[0-9]{3,4}$'
+        default: null
+      evidence:
+        # ожидаемые ТИПЫ свидетельств; конкретные ссылки — в записях проверки
+        type: array
+        items: {type: string, minLength: 1}
+        default: []
+  sources:
+    # перенос из исходных документов (прил. Ф); не нормативное основание
+    type: array
+    items:
+      type: object
+      additionalProperties: false
+      required: [doc, clause]
+      properties:
+        doc: {type: string, minLength: 1}
+        clause: {type: string, minLength: 1}
+    default: []
+  based_on:
+    # нормативные основания (С01 1.7)
+    type: array
+    items: {type: string, minLength: 1}
+    default: []
+  relations:
+    type: object
+    additionalProperties: false
+    properties:
+      depends_on:
+        $ref: '#/$defs/idList'
+      refines:
+        $ref: '#/$defs/idList'
+      replaces:
+        # заменяет прежнюю запись того же пространства (наследование ID при пересмотре);
+        # режимные связи AS-IS ведутся в матрице применения, не здесь
+        oneOf:
+          - type: 'null'
+          - type: string
+            pattern: '^(GEN|CDM|LDM)-[0-9]{3,4}$'
+        default: null
+  status:
+    enum: [draft, approved, withdrawn]
+
+$defs:
+  axis:
+    # ось применимости: непустой список; значения — дизъюнкция
+    type: array
+    minItems: 1
+    uniqueItems: true
+  idList:
+    type: array
+    uniqueItems: true
+    items: {type: string, pattern: '^(GEN|CDM|LDM)-[0-9]{3,4}$'}
+
+allOf:
+  # «undefined» допустим только единственным значением оси и только в черновике (прил. А).
+  # Каждое правило срабатывает только при фактическом наличии оси со значением undefined.
+  - if:
+      required: [applies_to]
+      properties:
+        applies_to:
+          required: [level]
+          properties:
+            level: {contains: {const: undefined}}
+    then:
+      properties:
+        status: {const: draft}
+        applies_to:
+          properties:
+            level: {maxItems: 1}
+  - if:
+      required: [applies_to]
+      properties:
+        applies_to:
+          required: [profile]
+          properties:
+            profile: {contains: {const: undefined}}
+    then:
+      properties:
+        status: {const: draft}
+        applies_to:
+          properties:
+            profile: {maxItems: 1}
+  - if:
+      required: [applies_to]
+      properties:
+        applies_to:
+          required: [mode]
+          properties:
+            mode: {contains: {const: undefined}}
+    then:
+      properties:
+        status: {const: draft}
+        applies_to:
+          properties:
+            mode: {maxItems: 1}
+  - if:
+      required: [applies_to]
+      properties:
+        applies_to:
+          required: [stage]
+          properties:
+            stage: {contains: {const: undefined}}
+    then:
+      properties:
+        status: {const: draft}
+        applies_to:
+          properties:
+            stage: {maxItems: 1}

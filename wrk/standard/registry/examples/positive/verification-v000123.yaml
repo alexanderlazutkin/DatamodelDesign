@@ -1,0 +1,20 @@
+# Испытательный пример схемы (Д2, ПВ-03): запись результата проверки.
+# Результат insufficient — «недостаточно сведений», требует доопределения (прил. А);
+# различается с неопределённостью правила применимости (устраняется владельцем
+# требования) — здесь нехватка сведений о проверяемой модели.
+# Значения — испытательные (иллюстрация С01); фактические записи — с Д5.
+schema_version: 1
+record: verification
+id: V-000123
+requirement: {id: CDM-015, revision: 1}
+standard_release: "0.2"
+procedure: {id: PR-001, version: 1}
+scope: fragment
+object: {model: M-042, version: 5}
+result: insufficient
+evidence: [EV-0451]
+checked_by:
+  initiator: рецензент контура R
+  executor: локальный помощник (А2)
+  date: "2026-10-11"
+exception: null

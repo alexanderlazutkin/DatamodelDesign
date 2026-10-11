@@ -1,0 +1,10 @@
+# Отрицательный пример: «undefined» — единственное значение оси,
+# смешение с конкретными значениями не допускается (прил. А).
+schema_version: 1
+id: CDM-095
+revision: 1
+formulation: Формулировка требования.
+modality: allowed
+applies_to:
+  mode: [to-be, undefined]
+status: draft

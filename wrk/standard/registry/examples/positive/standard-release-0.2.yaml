@@ -1,0 +1,20 @@
+# Испытательный пример схемы (Д2, ПВ-03): манифест пилотного выпуска (draft).
+# Идентификаторы и состав — испытательные; фактический пилотный срез собирается на Д3.
+schema_version: 1
+record: standard_release
+release: "0.2"
+date: "2026-10-11"
+status: draft
+includes:
+  requirements:
+    - {id: CDM-001, revision: 1}
+    - {id: CDM-015, revision: 1}
+    - {id: LDM-031, revision: 1}
+    - {id: LDM-039, revision: 1}
+    - {id: LDM-034, revision: 1}
+  components:
+    - {ref: schema, version: "1"}
+    - {ref: "прил. А (С01 v0.8)", version: "0.8"}
+    - {ref: "глоссарий (С04)", version: "1.0"}
+    - {ref: "прил. В (нотация)", version: "0.1-д1"}
+    - {ref: "прил. Г (метаданные)", version: "0.1-д2"}

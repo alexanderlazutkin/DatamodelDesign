@@ -1,0 +1,10 @@
+# Отрицательный пример: неопределённая применимость в утверждённой записи.
+# «undefined» допускается только для черновой записи (прил. А) — схема обязана отвергнуть.
+schema_version: 1
+id: LDM-099
+revision: 1
+formulation: Формулировка требования.
+modality: required
+applies_to:
+  mode: [undefined]
+status: approved

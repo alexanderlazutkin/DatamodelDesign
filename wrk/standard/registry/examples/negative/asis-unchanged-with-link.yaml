@@ -1,0 +1,10 @@
+# Отрицательный пример: unchanged — ссылка на адаптированное требование отсутствует
+# (прил. А: ссылка ведётся только при adapted/not_applied со своим типом связи).
+schema_version: 1
+record: asis_application
+standard_release: "0.2"
+requirement: {id: CDM-001, revision: 1}
+way: unchanged
+relation_type: applies_as_is
+linked: {id: CDM-002, revision: 1}
+as_is_criterion: Критерий.

@@ -1,0 +1,10 @@
+# Отрицательный пример: replaces для режимных связей не применяется (С01 v0.8).
+# Типы связей матрицы — только applies_as_is | adapts_for_mode.
+schema_version: 1
+record: asis_application
+standard_release: "0.2"
+requirement: {id: LDM-031, revision: 1}
+way: adapted
+relation_type: replaces
+linked: {id: LDM-039, revision: 1}
+rationale: Некорректная режимная связь.
