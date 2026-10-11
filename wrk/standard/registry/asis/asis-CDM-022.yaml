@@ -1,0 +1,9 @@
+# Матрица применения AS-IS, волна 2 Д7 (Р-022): CDM-022.
+schema_version: 1
+record: asis_application
+standard_release: "0.4-д7.2"
+requirement: {id: CDM-022, revision: 1}
+way: unchanged
+relation_type: applies_as_is
+as_is_criterion: >-
+  Включённые характеристики обоснованы пониманием, различением или правилами; перенос полей источника сам по себе не порождает характеристик.

@@ -1,0 +1,27 @@
+# Перенос (волна 2 Д7, Р-022): С02, 2.3.5.
+schema_version: 1
+id: CDM-016
+revision: 1
+formulation: >-
+  Если участие в связи зависит от состояния, периода или этапа процесса, указать условия; различать ограничения «в один момент времени» и «за весь срок существования». Неподтверждённые временные трактовки вносятся в реестр уточнений.
+modality: required
+applies_to:
+  level: [CDM]
+  mode: [to-be, as-is]
+  stage: [3]
+conditions: []
+exception_allowed: true
+verify:
+  kind: semantic
+  criterion: >-
+    Для каждой связи с временным или условным контекстом указаны условия и различены ограничения «в момент» и «за срок»; неподтверждённые трактовки — в реестре вопросов.
+  procedure: null
+  evidence: [паспорт модели, описания модели]
+sources:
+  - {doc: "Требования к КМД (С02)", clause: "2.3.5 (CDM-016)"}
+based_on: []
+relations:
+  depends_on: []
+  refines: []
+  replaces: null
+status: draft

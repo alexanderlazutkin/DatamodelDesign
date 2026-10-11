@@ -1,0 +1,9 @@
+# Матрица применения AS-IS, волна 2 Д7 (Р-022): CDM-024.
+schema_version: 1
+record: asis_application
+standard_release: "0.4-д7.2"
+requirement: {id: CDM-024, revision: 1}
+way: unchanged
+relation_type: applies_as_is
+as_is_criterion: >-
+  Для существенных характеристик указана обязательность и различены «неизвестно / не применимо / ещё не определено»; бизнес-обязательность не подменена заполненностью источников.

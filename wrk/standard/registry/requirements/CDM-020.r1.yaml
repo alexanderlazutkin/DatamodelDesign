@@ -1,0 +1,27 @@
+# Перенос (волна 2 Д7, Р-022): С02, 2.3.9.
+schema_version: 1
+id: CDM-020
+revision: 1
+formulation: >-
+  Проверять, отражают ли циклические связи самостоятельные факты и объясняется ли изолированность сущностей границами модели; подтверждённые конструкции сохраняются, неустановленные связи и контекст фиксируются.
+modality: recommended
+applies_to:
+  level: [CDM]
+  mode: [to-be, as-is]
+  stage: [3]
+conditions: []
+exception_allowed: true
+verify:
+  kind: structural
+  criterion: >-
+    Циклические связи проверены на самостоятельность факта; изолированные сущности объяснены границами модели либо зарегистрированы как вопрос.
+  procedure: null
+  evidence: [паспорт модели, описания модели]
+sources:
+  - {doc: "Требования к КМД (С02)", clause: "2.3.9 (CDM-020)"}
+based_on: []
+relations:
+  depends_on: []
+  refines: []
+  replaces: null
+status: draft

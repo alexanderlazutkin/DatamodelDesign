@@ -1,0 +1,9 @@
+# Матрица применения AS-IS, волна 2 Д7 (Р-022): CDM-019.
+schema_version: 1
+record: asis_application
+standard_release: "0.4-д7.2"
+requirement: {id: CDM-019, revision: 1}
+way: unchanged
+relation_type: applies_as_is
+as_is_criterion: >-
+  Для зависимых понятий определены независимость существования и контекст идентичности; идентифицирующие связи обозначены в нотации; механизм ключей источника не принят за доказательство бизнес-зависимости.

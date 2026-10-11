@@ -1,0 +1,27 @@
+# Перенос (волна 2 Д7, Р-022): С02, 2.4.5.
+schema_version: 1
+id: CDM-026
+revision: 1
+formulation: >-
+  Для используемых классификаций определить назначение, критерий классификации и источник либо владельца; указать, является классификация локальной, корпоративной или внешней. Расхождения трактовок и нерасшифрованные категории отражаются явно.
+modality: required
+applies_to:
+  level: [CDM]
+  mode: [to-be, as-is]
+  stage: [3]
+conditions: []
+exception_allowed: true
+verify:
+  kind: semantic
+  criterion: >-
+    Каждая используемая классификация имеет назначение, критерий и владельца/источник; локальность указана; нерасшифрованные категории зарегистрированы.
+  procedure: null
+  evidence: [паспорт модели, описания модели]
+sources:
+  - {doc: "Требования к КМД (С02)", clause: "2.4.5 (CDM-026)"}
+based_on: []
+relations:
+  depends_on: []
+  refines: []
+  replaces: null
+status: draft

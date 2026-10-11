@@ -1,0 +1,27 @@
+# Перенос (волна 2 Д7, Р-022): С02, 2.2.2.
+schema_version: 1
+id: CDM-005
+revision: 1
+formulation: >-
+  Обеспечить смысловое соответствие согласованным требованиям, процессам и нормативным ограничениям в границах модели; для значимых элементов указать основания включения. Противоречия между источниками фиксируются отдельно.
+modality: required
+applies_to:
+  level: [CDM]
+  mode: [to-be, as-is]
+  stage: [3]
+conditions: []
+exception_allowed: true
+verify:
+  kind: semantic
+  criterion: >-
+    Значимые элементы имеют основания включения (требование, процесс, источник); противоречия источников зафиксированы отдельно, а не устранены выбором удобного варианта.
+  procedure: null
+  evidence: [паспорт модели, описания модели]
+sources:
+  - {doc: "Требования к КМД (С02)", clause: "2.2.2 (CDM-005)"}
+based_on: []
+relations:
+  depends_on: []
+  refines: []
+  replaces: null
+status: draft

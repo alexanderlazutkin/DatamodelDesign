@@ -1,0 +1,9 @@
+# Матрица применения AS-IS, волна 2 Д7 (Р-022): CDM-030.
+schema_version: 1
+record: asis_application
+standard_release: "0.4-д7.2"
+requirement: {id: CDM-030, revision: 1}
+way: unchanged
+relation_type: applies_as_is
+as_is_criterion: >-
+  Существенные состояния, события и периоды определены; исторические представления различены с объектами; трактовка дат подтверждена источниками, а не именами полей.

@@ -1,0 +1,87 @@
+# Манифест промежуточного выпуска стандарта — волна 2 Д7 (Р-022).
+# Статус draft: 35 требований выпуска 0.2-д3 (approved, без изменений) +
+# 27 черновых записей переноса КМД (draft — до рецензирования контуром R
+# и утверждения методологом). Компоненты — приложения волн 1–2.
+schema_version: 1
+record: standard_release
+release: "0.4-д7.2"
+date: "2026-10-11"
+status: draft
+includes:
+  requirements:
+    - {id: CDM-001, revision: 1}
+    - {id: CDM-003, revision: 1}
+    - {id: CDM-004, revision: 1}
+    - {id: CDM-005, revision: 1}
+    - {id: CDM-006, revision: 1}
+    - {id: CDM-007, revision: 1}
+    - {id: CDM-008, revision: 1}
+    - {id: CDM-009, revision: 1}
+    - {id: CDM-010, revision: 1}
+    - {id: CDM-011, revision: 1}
+    - {id: CDM-012, revision: 1}
+    - {id: CDM-013, revision: 1}
+    - {id: CDM-014, revision: 1}
+    - {id: CDM-015, revision: 1}
+    - {id: CDM-016, revision: 1}
+    - {id: CDM-017, revision: 1}
+    - {id: CDM-018, revision: 1}
+    - {id: CDM-019, revision: 1}
+    - {id: CDM-020, revision: 1}
+    - {id: CDM-021, revision: 1}
+    - {id: CDM-022, revision: 1}
+    - {id: CDM-023, revision: 1}
+    - {id: CDM-024, revision: 1}
+    - {id: CDM-025, revision: 1}
+    - {id: CDM-026, revision: 1}
+    - {id: CDM-027, revision: 1}
+    - {id: CDM-028, revision: 1}
+    - {id: CDM-029, revision: 1}
+    - {id: CDM-030, revision: 1}
+    - {id: CDM-031, revision: 1}
+    - {id: CDM-032, revision: 1}
+    - {id: CDM-033, revision: 1}
+    - {id: CDM-034, revision: 1}
+    - {id: CDM-035, revision: 1}
+    - {id: CDM-036, revision: 1}
+    - {id: CDM-037, revision: 1}
+    - {id: CDM-038, revision: 1}
+    - {id: CDM-039, revision: 1}
+    - {id: CDM-040, revision: 1}
+    - {id: CDM-042, revision: 1}
+    - {id: CDM-043, revision: 1}
+    - {id: GEN-001, revision: 1}
+    - {id: GEN-002, revision: 1}
+    - {id: GEN-003, revision: 1}
+    - {id: GEN-004, revision: 1}
+    - {id: GEN-005, revision: 1}
+    - {id: GEN-006, revision: 1}
+    - {id: GEN-007, revision: 1}
+    - {id: LDM-002, revision: 1}
+    - {id: LDM-009, revision: 1}
+    - {id: LDM-011, revision: 1}
+    - {id: LDM-013, revision: 1}
+    - {id: LDM-023, revision: 1}
+    - {id: LDM-026, revision: 1}
+    - {id: LDM-027, revision: 1}
+    - {id: LDM-028, revision: 1}
+    - {id: LDM-030, revision: 1}
+    - {id: LDM-031, revision: 1}
+    - {id: LDM-032, revision: 1}
+    - {id: LDM-036, revision: 1}
+    - {id: LDM-037, revision: 1}
+    - {id: LDM-039, revision: 1}
+  components:
+    - {ref: schema, version: "1.1"}
+    - {ref: "Стандарт.md (рабочая редакция)", version: "0.4"}
+    - {ref: "Структура стандарта (С01)", version: "0.8"}
+    - {ref: "Глоссарий (С04)", version: "1.0"}
+    - {ref: "Правила переноса Б1–Б5 (Проба переноса)", version: "0.1 (Р-014)"}
+    - {ref: "прил. А (каталог и схема записей проверки)", version: "0.3-в1"}
+    - {ref: "прил. Г (минимальные метаданные)", version: "0.3-в1"}
+    - {ref: "прил. Ж (контрольные листы и процедуры)", version: "0.3-в1"}
+    - {ref: "прил. И (профиль ИОД)", version: "0.3-в1 (черновик-основа, до ПВ-08)"}
+    - {ref: "прил. К (матрица ответственности)", version: "0.3-в1 (черновая схема, до ПВ-01)"}
+    - {ref: "прил. Л (шаблоны артефактов)", version: "0.3-в1"}
+    - {ref: "прил. В (нотация и легенда)", version: "0.4-в2 (учебные примеры — после ПВ-05)"}
+    - {ref: "прил. Р (паттерны и антипаттерны)", version: "0.4-в2 (учебные примеры — после ПВ-05)"}

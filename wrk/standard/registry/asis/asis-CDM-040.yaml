@@ -1,0 +1,9 @@
+# Матрица применения AS-IS, волна 2 Д7 (Р-022): CDM-040.
+schema_version: 1
+record: asis_application
+standard_release: "0.4-д7.2"
+requirement: {id: CDM-040, revision: 1}
+way: unchanged
+relation_type: applies_as_is
+as_is_criterion: >-
+  Комплект содержит перечисленные компоненты либо ссылки на управляемые описания; для AS-IS — сведения об источниках и расхождениях; диаграммы без определений недостаточны.

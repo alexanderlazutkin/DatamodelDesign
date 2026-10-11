@@ -1,0 +1,9 @@
+# Матрица применения AS-IS, волна 2 Д7 (Р-022): CDM-028.
+schema_version: 1
+record: asis_application
+standard_release: "0.4-д7.2"
+requirement: {id: CDM-028, revision: 1}
+way: unchanged
+relation_type: applies_as_is
+as_is_criterion: >-
+  Роли и состояния не выдаются за типы объектов без обоснования; выделенные роли/состояния имеют носителя, условия и совмещение; спорные случаи — в реестре вопросов.

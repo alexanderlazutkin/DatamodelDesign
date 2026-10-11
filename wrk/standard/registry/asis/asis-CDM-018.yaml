@@ -1,0 +1,9 @@
+# Матрица применения AS-IS, волна 2 Д7 (Р-022): CDM-018.
+schema_version: 1
+record: asis_application
+standard_release: "0.4-д7.2"
+requirement: {id: CDM-018, revision: 1}
+way: unchanged
+relation_type: applies_as_is
+as_is_criterion: >-
+  Факты участия с самостоятельным смыслом, жизненным циклом или значимыми характеристиками представлены ассоциативными сущностями либо эквивалентной конструкцией.

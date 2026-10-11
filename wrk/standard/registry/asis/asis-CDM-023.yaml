@@ -1,0 +1,9 @@
+# Матрица применения AS-IS, волна 2 Д7 (Р-022): CDM-023.
+schema_version: 1
+record: asis_application
+standard_release: "0.4-д7.2"
+requirement: {id: CDM-023, revision: 1}
+way: unchanged
+relation_type: applies_as_is
+as_is_criterion: >-
+  Каждая включённая характеристика имеет определение смысла; существенные единицы, контексты и области значений указаны; неподтверждённые трактовки маркированы.

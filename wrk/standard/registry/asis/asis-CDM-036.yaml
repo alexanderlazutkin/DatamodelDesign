@@ -1,0 +1,9 @@
+# Матрица применения AS-IS, волна 2 Д7 (Р-022): CDM-036.
+schema_version: 1
+record: asis_application
+standard_release: "0.4-д7.2"
+requirement: {id: CDM-036, revision: 1}
+way: unchanged
+relation_type: applies_as_is
+as_is_criterion: >-
+  Для каждого общего понятия указаны владелец определения и контекстные различия; существенные противоречия разрешены либо оформлены ограничениями; объявление единого определения подтверждено согласованием.

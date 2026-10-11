@@ -1,0 +1,27 @@
+# Перенос (волна 2 Д7, Р-022): С02, 2.3.6.
+schema_version: 1
+id: CDM-017
+revision: 1
+formulation: >-
+  Допускается отображать связь «многие-ко-многим» непосредственно, без введения промежуточной сущности; её смысл, роли и кардинальности должны быть определены. Наличие промежуточной таблицы хранения не требует отдельной концептуальной сущности.
+modality: allowed
+applies_to:
+  level: [CDM]
+  mode: [to-be, as-is]
+  stage: [3]
+conditions: []
+exception_allowed: true
+verify:
+  kind: semantic
+  criterion: >-
+    При прямом отображении M:M смысл, роли и кардинальности определены; промежуточная таблица хранения не порождает обязательную концептуальную сущность.
+  procedure: null
+  evidence: [паспорт модели, описания модели]
+sources:
+  - {doc: "Требования к КМД (С02)", clause: "2.3.6 (CDM-017)"}
+based_on: []
+relations:
+  depends_on: []
+  refines: []
+  replaces: null
+status: draft

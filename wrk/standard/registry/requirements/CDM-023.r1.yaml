@@ -1,0 +1,27 @@
+# Перенос (волна 2 Д7, Р-022): С02, 2.4.2.
+schema_version: 1
+id: CDM-023
+revision: 1
+formulation: >-
+  Для каждой включённой характеристики определить смысл; при существенности указать единицу измерения, временной контекст, смысловую область значений или ссылку на термин. Неподтверждённые трактовки маркируются.
+modality: required
+applies_to:
+  level: [CDM]
+  mode: [to-be, as-is]
+  stage: [3]
+conditions: []
+exception_allowed: true
+verify:
+  kind: semantic
+  criterion: >-
+    Каждая включённая характеристика имеет определение смысла; существенные единицы, контексты и области значений указаны; неподтверждённые трактовки маркированы.
+  procedure: null
+  evidence: [паспорт модели, описания модели]
+sources:
+  - {doc: "Требования к КМД (С02)", clause: "2.4.2 (CDM-023)"}
+based_on: []
+relations:
+  depends_on: []
+  refines: []
+  replaces: null
+status: draft

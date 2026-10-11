@@ -1,0 +1,9 @@
+# Матрица применения AS-IS, волна 2 Д7 (Р-022): CDM-031.
+schema_version: 1
+record: asis_application
+standard_release: "0.4-д7.2"
+requirement: {id: CDM-031, revision: 1}
+way: unchanged
+relation_type: applies_as_is
+as_is_criterion: >-
+  Каждое производное понятие имеет смысл, исходные понятия, условия расчёта и контекст либо ссылку на правило; отсутствующее правило зафиксировано вопросом, а не формулой.
