@@ -1,0 +1,9 @@
+# Матрица применения AS-IS, волна 3 Д7 (Р-023): LDM-035.
+schema_version: 1
+record: asis_application
+standard_release: "0.5-д7.3"
+requirement: {id: LDM-035, revision: 1}
+way: unchanged
+relation_type: applies_as_is
+as_is_criterion: >-
+  Роли и ответственные определены (прил. К); порядок поэтапной проверки и утверждения установлен.

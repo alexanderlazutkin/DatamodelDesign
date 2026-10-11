@@ -1,0 +1,9 @@
+# Матрица применения AS-IS, волна 3 Д7 (Р-023): LDM-003.
+schema_version: 1
+record: asis_application
+standard_release: "0.5-д7.3"
+requirement: {id: LDM-003, revision: 1}
+way: unchanged
+relation_type: applies_as_is
+as_is_criterion: >-
+  Соответствия ЛМД ↔ КМД зафиксированы (виды соответствий — 8.4); статус КМД и основания восстановления указаны; изменения смысла согласованы.

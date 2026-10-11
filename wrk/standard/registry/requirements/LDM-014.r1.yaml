@@ -1,0 +1,27 @@
+# Перенос (волна 3 Д7, Р-023): С03, 2.3.
+schema_version: 1
+id: LDM-014
+revision: 1
+formulation: >-
+  Обеспечить согласованность типа и формата представления ссылочного атрибута и целевого идентификатора. Фиксируются фактические типы, преобразования и известные несовместимости.
+modality: required
+applies_to:
+  level: [LDM]
+  mode: [to-be, as-is]
+  stage: [5]
+conditions: []
+exception_allowed: true
+verify:
+  kind: structural
+  criterion: >-
+    Тип/формат ссылки согласован с целевым идентификатором либо несовместимость зафиксирована.
+  procedure: null
+  evidence: [паспорт модели, описания модели]
+sources:
+  - {doc: "Требования к ЛМД (С03)", clause: "LDM-014 (LDM-014)"}
+based_on: []
+relations:
+  depends_on: []
+  refines: []
+  replaces: null
+status: draft

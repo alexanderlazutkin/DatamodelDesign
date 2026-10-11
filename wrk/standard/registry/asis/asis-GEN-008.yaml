@@ -1,0 +1,9 @@
+# Матрица применения AS-IS, волна 3 Д7 (Р-023): GEN-008.
+schema_version: 1
+record: asis_application
+standard_release: "0.5-д7.3"
+requirement: {id: GEN-008, revision: 1}
+way: unchanged
+relation_type: applies_as_is
+as_is_criterion: >-
+  Нотация отображает сущности, связи, роли и конструкции однозначно; легенда приведена (прил. В); для исходных схем значения обозначений проверены.

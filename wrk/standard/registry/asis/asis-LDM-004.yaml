@@ -1,0 +1,9 @@
+# Матрица применения AS-IS, волна 3 Д7 (Р-023): LDM-004.
+schema_version: 1
+record: asis_application
+standard_release: "0.5-д7.3"
+requirement: {id: LDM-004, revision: 1}
+way: unchanged
+relation_type: applies_as_is
+as_is_criterion: >-
+  Все сущности и атрибуты согласованного охвата включены либо явно исключены; неописанные объекты учтены отдельно; частичная модель не предъявляется как полная.

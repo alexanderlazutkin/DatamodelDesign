@@ -1,0 +1,27 @@
+# Перенос (волна 3 Д7, Р-023): С03, 2.2.
+schema_version: 1
+id: LDM-007
+revision: 1
+formulation: >-
+  Определить для каждого атрибута смысл и существенные особенности интерпретации, тип атрибута (бизнес, системный). Описание не сводится к повторению имени; повторно используемое определение допускается задавать ссылкой на домен или термин. Для бизнес-атрибутов используется подтверждённое описание.
+modality: required
+applies_to:
+  level: [LDM]
+  mode: [to-be, as-is]
+  stage: [5]
+conditions: []
+exception_allowed: true
+verify:
+  kind: semantic
+  criterion: >-
+    Каждый атрибут охвата имеет определение смысла и типа; описание не повторяет имя; ссылки на домен/термин корректны.
+  procedure: null
+  evidence: [паспорт модели, описания модели]
+sources:
+  - {doc: "Требования к ЛМД (С03)", clause: "LDM-007 (LDM-007)"}
+based_on: []
+relations:
+  depends_on: []
+  refines: []
+  replaces: null
+status: draft

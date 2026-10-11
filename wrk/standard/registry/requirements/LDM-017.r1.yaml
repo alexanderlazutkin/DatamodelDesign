@@ -1,0 +1,27 @@
+# Перенос (волна 3 Д7, Р-023): С03, 2.3.
+schema_version: 1
+id: LDM-017
+revision: 1
+formulation: >-
+  Изолированные сущности не используются по умолчанию, но допустимы, если соответствуют предметной области или границам модели; в описании сущности указывается причина изолированности.
+modality: recommended
+applies_to:
+  level: [LDM]
+  mode: [to-be, as-is]
+  stage: [5]
+conditions: []
+exception_allowed: true
+verify:
+  kind: structural
+  criterion: >-
+    Каждая изолированная сущность имеет указанную причину изолированности.
+  procedure: null
+  evidence: [паспорт модели, описания модели]
+sources:
+  - {doc: "Требования к ЛМД (С03)", clause: "LDM-017 (LDM-017)"}
+based_on: []
+relations:
+  depends_on: []
+  refines: []
+  replaces: null
+status: draft
