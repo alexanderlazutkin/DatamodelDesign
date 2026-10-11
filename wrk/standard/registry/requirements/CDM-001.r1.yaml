@@ -1,0 +1,31 @@
+# Перенос (Д3, Р-016): С02, 2.1.1 (CDM-001); испытательная запись Д2 принята
+# как рабочая редакция. AS-IS-реквизиты обследования — в критерии матрицы AS-IS.
+schema_version: 1
+id: CDM-001
+revision: 1
+formulation: >-
+  Указать в паспорте модели назначение, домен, организационный и процессный
+  контекст, охват, исключения, режим, версию, статус и ответственного.
+modality: required
+applies_to:
+  level: [CDM]
+  mode: [to-be, as-is]
+  stage: [2]
+conditions: []
+exception_allowed: false
+verify:
+  kind: documentary
+  criterion: >-
+    Паспорт модели содержит все десять реквизитов: назначение, домен,
+    организационный контекст, процессный контекст, охват, исключения, режим,
+    версию, статус, ответственного.
+  procedure: null
+  evidence: [паспорт модели]
+sources:
+  - {doc: "Требования к КМД (С02)", clause: "2.1.1 (CDM-001)"}
+based_on: []
+relations:
+  depends_on: []
+  refines: []
+  replaces: null
+status: draft

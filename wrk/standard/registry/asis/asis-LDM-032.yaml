@@ -1,0 +1,11 @@
+# Матрица применения AS-IS, пилотный выпуск 0.2-д3 (Д3, Р-016).
+schema_version: 1
+record: asis_application
+standard_release: "0.2-д3"
+requirement: {id: LDM-032, revision: 1}
+way: unchanged
+relation_type: applies_as_is
+as_is_criterion: >-
+  Выявленная избыточность и известные правила согласования копий отражены;
+  предложения по устранению аномалий ведутся отдельно от текущего состояния
+  (GEN-001); обязательное исправление системы не требуется.

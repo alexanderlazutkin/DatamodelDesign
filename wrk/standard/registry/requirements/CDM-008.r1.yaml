@@ -1,0 +1,31 @@
+# Перенос (Д3, Р-016): С02, 2.2.5 (CDM-008). AS-IS-допуск сохранения исходных
+# названий как синонимов — в критерии матрицы AS-IS (случай § 7.2 плана).
+schema_version: 1
+id: CDM-008
+revision: 1
+formulation: >-
+  Использовать согласованный язык, бизнес-термины и правила сокращений.
+  Имена сущностей обозначают понятия, а не действия интерфейса или названия
+  таблиц.
+modality: required
+applies_to:
+  level: [CDM]
+  mode: [to-be, as-is]
+  stage: [3]
+conditions: []
+exception_allowed: true
+verify:
+  kind: documentary
+  criterion: >-
+    Правила именования согласованы и применяются; имена сущностей обозначают
+    понятия предметной области; отклонения от стиля зафиксированы.
+  procedure: null
+  evidence: [словарь сущностей, правила именования]
+sources:
+  - {doc: "Требования к КМД (С02)", clause: "2.2.5 (CDM-008)"}
+based_on: []
+relations:
+  depends_on: []
+  refines: []
+  replaces: null
+status: draft

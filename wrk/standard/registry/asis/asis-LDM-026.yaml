@@ -1,0 +1,11 @@
+# Матрица применения AS-IS, пилотный выпуск 0.2-д3 (Д3, Р-016).
+schema_version: 1
+record: asis_application
+standard_release: "0.2-д3"
+requirement: {id: LDM-026, revision: 1}
+way: unchanged
+relation_type: applies_as_is
+as_is_criterion: >-
+  Аналогично TO-BE: категория (разметка) указана со ссылкой на корпоративную
+  классификацию; детальные права доступа не перенесены; в документации —
+  синтетические либо обезличенные примеры.

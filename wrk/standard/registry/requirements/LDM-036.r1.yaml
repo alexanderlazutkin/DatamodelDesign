@@ -1,0 +1,31 @@
+# Перенос (Д3, Р-016): С03, этап 6 (LDM-036). Основа случая § 7.2 «отозванная
+# версия» вместе с GEN-005 и CDM-039.
+schema_version: 1
+id: LDM-036
+revision: 1
+formulation: >-
+  Хранить версии ЛМД, историю изменений и связи с требованиями либо релизами;
+  определить механизм и порядок сверки ЛМД с ФМД в процессе разработки.
+modality: required
+applies_to:
+  level: [LDM]
+  mode: [to-be, as-is]
+  stage: [7, 8]
+conditions: []
+exception_allowed: true
+verify:
+  kind: documentary
+  criterion: >-
+    История версий ведётся со связями с требованиями либо релизами; механизм
+    и порядок сверки ЛМД с ФМД определены; изменения сопровождаются оценкой
+    влияния.
+  procedure: null
+  evidence: [история версий, регламент сверки]
+sources:
+  - {doc: "Требования к ЛМД (С03)", clause: "этап 6 (LDM-036)"}
+based_on: []
+relations:
+  depends_on: []
+  refines: []
+  replaces: null
+status: draft

@@ -1,0 +1,11 @@
+# Матрица применения AS-IS, пилотный выпуск 0.2-д3 (Д3, Р-016).
+schema_version: 1
+record: asis_application
+standard_release: "0.2-д3"
+requirement: {id: CDM-010, revision: 1}
+way: unchanged
+relation_type: applies_as_is
+as_is_criterion: >-
+  Определения сущностей соответствуют TO-BE с учётом допуска рабочих
+  определений (3.7): для каждого указаны источник и статус смыслового
+  подтверждения.
