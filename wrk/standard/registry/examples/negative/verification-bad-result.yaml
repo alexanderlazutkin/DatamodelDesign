@@ -1,5 +1,5 @@
-# Отрицательный пример: not_applied без обоснования; результат проверки —
-# закрытый перечень (verified | failed | not_applicable | not_checked | insufficient),
+# Отрицательный пример: результат проверки — закрытый перечень
+# (verified | failed | not_applicable | not_checked | insufficient);
 # «passed» в нём нет.
 schema_version: 1
 record: verification

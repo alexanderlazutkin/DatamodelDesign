@@ -28,13 +28,17 @@ properties:
     type: string
     minLength: 1
   procedure:
-    # контрольная процедура и её версия (прил. Ж)
-    type: object
-    additionalProperties: false
-    required: [id, version]
-    properties:
-      id: {type: string, pattern: '^PR-[0-9]{3,4}$'}
-      version: {type: integer, minimum: 1}
+    # контрольная процедура и её версия (прил. Ж). До наполнения прил. Ж (Д7)
+    # допускается null — записи проверок создаются без фиктивных PR-ID
+    # (решение REV-002 прогона std-002, 2026-10-11).
+    oneOf:
+      - type: 'null'
+      - type: object
+        additionalProperties: false
+        required: [id, version]
+        properties:
+          id: {type: string, pattern: '^PR-[0-9]{3,4}$'}
+          version: {type: integer, minimum: 1}
   scope:
     enum: [model, fragment]
   object:

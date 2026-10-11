@@ -148,6 +148,45 @@ class SemanticsTests(unittest.TestCase):
         )
         self.assertFalse(ok)
 
+    def test_not_applied_requires_rationale(self):
+        """REV-001/std-002: not_applied без обоснования и без связей — отвергается.
+
+        Отдельного YAML-файла нет: кандидат прогона не может добавлять файлы
+        к манифесту базы; правило покрыто этим тестом (эквивалент negative-примера).
+        """
+        ok, _ = self._validate(
+            {
+                "schema_version": 1,
+                "record": "asis_application",
+                "standard_release": "0.2",
+                "requirement": {"id": "CDM-038", "revision": 1},
+                "way": "not_applied",
+            }
+        )
+        self.assertFalse(ok)
+
+    def test_verification_procedure_nullable(self):
+        """REV-002/std-002: procedure: null допустим до наполнения прил. Ж (Д7)."""
+        ok, msg = self._validate(
+            {
+                "schema_version": 1,
+                "record": "verification",
+                "id": "V-000125",
+                "requirement": {"id": "CDM-015", "revision": 1},
+                "standard_release": "0.2",
+                "procedure": None,
+                "scope": "model",
+                "object": {"model": "M-042", "version": 5},
+                "result": "not_checked",
+                "checked_by": {
+                    "initiator": "тест",
+                    "executor": "тест",
+                    "date": "2026-10-11",
+                },
+            }
+        )
+        self.assertTrue(ok, msg)
+
 
 if __name__ == "__main__":
     unittest.main()
