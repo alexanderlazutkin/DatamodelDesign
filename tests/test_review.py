@@ -1385,5 +1385,485 @@ class TestFullFlow(BaseTest):
         self.assertEqual(code, 0, out)
 
 
+# ------------------------------------------- регрессия Р-013 (std-002)
+
+
+DOC_A_R1 = """# Документ A
+
+## 1. Требования
+
+1.1. Имя объекта по возможности короткое.
+
+## 2. Ссылки
+
+2.1. Правила применяются согласно п. 9.9.
+"""
+
+DOC_B_R1 = """# Документ B
+
+3.1. Формулировка по возможности точная.
+"""
+
+DOC_C_R1 = """# Документ C
+
+4.1. Пункт требует примера.
+"""
+
+
+class TestStd002Round2Subset(BaseTest):
+    """Р-013, сценарий std-002: раунд 2 правит подмножество файлов раунда 1.
+
+    Раунд 1 изменяет A и B; раунд 2 — только B и дополнительно C. Список
+    changed накопительный, поэтому changes.json раунда 2 обязан перечислить
+    и A (не тронутый в раунде 2), атрибутировав его к принятому замечанию
+    раунда 1. До исправления helper это было формально невозможно: ID
+    предыдущих раундов отвергались.
+    """
+
+    def setUp(self):
+        super().setUp()
+        self.extra_projects.append(self.p)
+        self.p = Project(
+            inputs=["docs/base.md", "docs/extra.md", "docs/third.md"],
+            allowed=["docs/base.md", "docs/extra.md", "docs/third.md"],
+            base_doc=DOC_A_R1,
+            extra_doc=DOC_B_R1,
+        )
+        (self.p.root / "docs" / "third.md").write_text(DOC_C_R1, encoding="utf-8")
+
+    # -- артефакты раунда 1 ------------------------------------------------
+
+    def doc_a_r2(self):
+        return DOC_A_R1.replace(
+            "1.1. Имя объекта по возможности короткое.",
+            "1.1. Рекомендуется короткое имя объекта.",
+        )
+
+    def doc_b_r2(self):
+        return DOC_B_R1.replace(
+            "3.1. Формулировка по возможности точная.",
+            "3.1. Формулировка должна быть точной.",
+        )
+
+    def doc_b_r3(self):
+        return self.doc_b_r2().replace(
+            "3.1. Формулировка должна быть точной.",
+            "3.1. Формулировка должна быть точной и однозначной.",
+        )
+
+    def doc_c_r2(self):
+        return DOC_C_R1.replace(
+            "4.1. Пункт требует примера.",
+            "4.1. Пункт требует примера (см. прил. А).",
+        )
+
+    def review_r1(self):
+        findings = [
+            {
+                "id": "REV-001",
+                "category": "ambiguity",
+                "severity": "minor",
+                "title": "Размытая модальность в A",
+                "location": {
+                    "path": "docs/base.md",
+                    "start_line": 5,
+                    "end_line": 5,
+                    "heading": "1. Требования",
+                },
+                "quote": "Имя объекта по возможности короткое.",
+                "basis": "R-02",
+                "scenario": "«по возможности» не задаёт критерия.",
+                "proposal": "Рекомендуется.",
+                "status": "new",
+            },
+            {
+                "id": "REV-002",
+                "category": "ambiguity",
+                "severity": "minor",
+                "title": "Размытая модальность в B",
+                "location": {
+                    "path": "docs/extra.md",
+                    "start_line": 3,
+                    "end_line": 3,
+                    "heading": "",
+                },
+                "quote": "Формулировка по возможности точная.",
+                "basis": "R-02",
+                "scenario": "«по возможности» не задаёт критерия.",
+                "proposal": "Должна быть.",
+                "status": "new",
+            },
+            {
+                "id": "REV-003",
+                "category": "traceability",
+                "severity": "suggestion",
+                "title": "Ссылка A на несуществующий пункт",
+                "location": {
+                    "path": "docs/base.md",
+                    "start_line": 9,
+                    "end_line": 9,
+                    "heading": "2. Ссылки",
+                },
+                "quote": "Правила применяются согласно п. 9.9.",
+                "basis": "R-01",
+                "scenario": "Пункт 9.9 не существует.",
+                "proposal": "Исправить ссылку.",
+                "status": "new",
+            },
+        ]
+        doc = self.p.build_review(findings=findings, reviewed=list(self.p.inputs))
+        return doc
+
+    def run_round1(self):
+        assert self.p.prepare()[0] == 0
+        assert self.p.run("check", "--run", "run-1", "--target", "snapshot")[0] == 0
+        code, out = self.p.run(
+            "record-review",
+            "--run",
+            "run-1",
+            "--round",
+            "1",
+            "--file",
+            self.p.submit("review.json", self.review_r1()),
+        )
+        assert code == 0, out
+        decisions = self.p.build_decisions(
+            decisions=[
+                {"finding_id": "REV-001", "action": "accept", "reason": "исправить"},
+                {"finding_id": "REV-002", "action": "accept", "reason": "исправить"},
+                {"finding_id": "REV-003", "action": "defer", "reason": "до Д3"},
+            ]
+        )
+        code, out = self.p.run(
+            "record-decision",
+            "--run",
+            "run-1",
+            "--round",
+            "1",
+            "--file",
+            self.p.submit("decisions.json", decisions),
+        )
+        assert code == 0, out
+        rd = self.p.run_dir() / "rounds" / "01" / "candidate" / "docs"
+        rd.mkdir(parents=True, exist_ok=True)
+        (rd / "base.md").write_text(self.doc_a_r2(), encoding="utf-8")
+        (rd / "extra.md").write_text(self.doc_b_r2(), encoding="utf-8")
+        (rd / "third.md").write_text(DOC_C_R1, encoding="utf-8")
+        changes = {
+            "schema_version": 1,
+            "run_id": "run-1",
+            "round": 1,
+            "base_manifest_hash": self.p.manifest_hash(),
+            "changes": [
+                {"path": "docs/base.md", "finding_ids": ["REV-001"]},
+                {"path": "docs/extra.md", "finding_ids": ["REV-002"]},
+            ],
+        }
+        (self.p.run_dir() / "rounds" / "01" / "changes.json").write_text(
+            json.dumps(changes, ensure_ascii=False, indent=2), encoding="utf-8"
+        )
+        code, out = self.p.run(
+            "check", "--run", "run-1", "--target", "candidate", "--round", "1"
+        )
+        assert code == 0, out
+        code, out = self.p.run("diff", "--run", "run-1", "--round", "1")
+        assert code == 0, out
+        verification = self.p.build_verification(
+            resolutions=[
+                {"finding_id": "REV-001", "status": "resolved", "note": "ок"},
+                {"finding_id": "REV-002", "status": "resolved", "note": "ок"},
+            ],
+            include_deferred=True,
+        )
+        verification["reviewed_paths"] = list(self.p.inputs)
+        code, out = self.p.run(
+            "record-review",
+            "--run",
+            "run-1",
+            "--round",
+            "1",
+            "--phase",
+            "verification",
+            "--file",
+            self.p.submit("verification.json", verification),
+        )
+        assert code == 0, out
+        approval = self.p.build_approval(decision="revise", reason="доработать B")
+        code, out = self.p.run(
+            "record-approval",
+            "--run",
+            "run-1",
+            "--round",
+            "1",
+            "--file",
+            self.p.submit("approval.json", approval),
+        )
+        assert code == 0, out
+
+    # -- артефакты раунда 2 ------------------------------------------------
+
+    def round2_base_hash(self):
+        return sha_file(self.p.run_dir() / "rounds" / "01" / "candidate-manifest.json")
+
+    def review_r2(self):
+        doc = {
+            "schema_version": 1,
+            "run_id": "run-1",
+            "round": 2,
+            "phase": "review",
+            "base_manifest_hash": self.round2_base_hash(),
+            "criteria": {
+                "checklist_version": self.p.checklist["version"],
+                "checklist_sha256": sha_file(self.p.root / "checklist.json"),
+            },
+            "reviewer": "reviewer-test",
+            "model": "test-model",
+            "reviewed_paths": list(self.p.inputs),
+            "unreviewed": [],
+            "checklist_coverage": [
+                {"item_id": "R-01", "status": "checked"},
+                {"item_id": "R-02", "status": "checked"},
+            ],
+            "findings": [
+                {
+                    "id": "REV-004",
+                    "category": "ambiguity",
+                    "severity": "minor",
+                    "title": "Недостаточная определённость в B",
+                    "location": {
+                        "path": "docs/extra.md",
+                        "start_line": 3,
+                        "end_line": 3,
+                        "heading": "",
+                    },
+                    "quote": "Формулировка должна быть точной.",
+                    "basis": "R-02",
+                    "scenario": "Нет критерия однозначности.",
+                    "proposal": "Уточнить.",
+                    "status": "new",
+                }
+            ],
+            "summary": {"verdict": "needs_changes", "coverage": "complete", "note": ""},
+        }
+        return doc
+
+    def round2_decisions(self):
+        return {
+            "schema_version": 1,
+            "run_id": "run-1",
+            "round": 2,
+            "base_manifest_hash": self.round2_base_hash(),
+            "review_hash": sha_file(self.p.run_dir() / "rounds" / "02" / "review.json"),
+            "decision_maker": "dm",
+            "confirmation_basis": "интерактивно (тест)",
+            "decisions": [
+                {"finding_id": "REV-004", "action": "accept", "reason": "исправить"}
+            ],
+            "no_fixes_confirmed": False,
+        }
+
+    def make_round2_candidate(self):
+        rd = self.p.run_dir() / "rounds" / "02" / "candidate" / "docs"
+        rd.mkdir(parents=True, exist_ok=True)
+        (rd / "base.md").write_text(self.doc_a_r2(), encoding="utf-8")
+        (rd / "extra.md").write_text(self.doc_b_r3(), encoding="utf-8")
+        (rd / "third.md").write_text(self.doc_c_r2(), encoding="utf-8")
+
+    def write_round2_changes(self, entries):
+        changes = {
+            "schema_version": 1,
+            "run_id": "run-1",
+            "round": 2,
+            "base_manifest_hash": self.round2_base_hash(),
+            "changes": entries,
+        }
+        (self.p.run_dir() / "rounds" / "02" / "changes.json").write_text(
+            json.dumps(changes, ensure_ascii=False, indent=2), encoding="utf-8"
+        )
+
+    def to_round2_candidate(self):
+        self.run_round1()
+        code, out = self.p.run(
+            "record-review",
+            "--run",
+            "run-1",
+            "--round",
+            "2",
+            "--file",
+            self.p.submit("review2.json", self.review_r2()),
+        )
+        assert code == 0, out
+        code, out = self.p.run(
+            "record-decision",
+            "--run",
+            "run-1",
+            "--round",
+            "2",
+            "--file",
+            self.p.submit("decisions2.json", self.round2_decisions()),
+        )
+        assert code == 0, out
+        self.make_round2_candidate()
+
+    def check_round2(self):
+        return self.p.run(
+            "check", "--run", "run-1", "--target", "candidate", "--round", "2"
+        )
+
+    # -- тесты -------------------------------------------------------------
+
+    def test_round2_subset_attributed_to_round1_ids(self):
+        self.to_round2_candidate()
+        self.write_round2_changes(
+            [
+                {"path": "docs/base.md", "finding_ids": ["REV-001"]},
+                {"path": "docs/extra.md", "finding_ids": ["REV-004"]},
+                {"path": "docs/third.md", "finding_ids": ["REV-004"]},
+            ]
+        )
+        code, out = self.check_round2()
+        self.assertEqual(code, 0, out)
+        self.assertIn("изменено файлов: 3", out)
+
+    def test_round2_must_list_files_changed_in_round1(self):
+        self.to_round2_candidate()
+        # A отличается от снимка (изменён в раунде 1) — обязан быть перечислен
+        self.write_round2_changes(
+            [
+                {"path": "docs/extra.md", "finding_ids": ["REV-004"]},
+                {"path": "docs/third.md", "finding_ids": ["REV-004"]},
+            ]
+        )
+        code, out = self.check_round2()
+        self.assertEqual(code, 1, out)
+        self.assertIn("docs/base.md", out)
+
+    def test_prev_round_id_rejected_for_newly_changed_file(self):
+        self.to_round2_candidate()
+        # third.md впервые изменён в раунде 2: ID раунда 1 недопустим
+        self.write_round2_changes(
+            [
+                {"path": "docs/base.md", "finding_ids": ["REV-001"]},
+                {"path": "docs/extra.md", "finding_ids": ["REV-004"]},
+                {"path": "docs/third.md", "finding_ids": ["REV-002"]},
+            ]
+        )
+        code, out = self.check_round2()
+        self.assertEqual(code, 1, out)
+        self.assertIn("REV-002", out)
+
+    def test_prev_round_deferred_id_rejected(self):
+        self.to_round2_candidate()
+        # REV-003 отложен в раунде 1 — атрибуция изменений на него недопустима
+        self.write_round2_changes(
+            [
+                {"path": "docs/base.md", "finding_ids": ["REV-003"]},
+                {"path": "docs/extra.md", "finding_ids": ["REV-004"]},
+                {"path": "docs/third.md", "finding_ids": ["REV-004"]},
+            ]
+        )
+        code, out = self.check_round2()
+        self.assertEqual(code, 1, out)
+        self.assertIn("REV-003", out)
+
+    def test_unknown_id_rejected_in_round2(self):
+        self.to_round2_candidate()
+        self.write_round2_changes(
+            [
+                {"path": "docs/base.md", "finding_ids": ["REV-001"]},
+                {"path": "docs/extra.md", "finding_ids": ["REV-999"]},
+                {"path": "docs/third.md", "finding_ids": ["REV-004"]},
+            ]
+        )
+        code, out = self.check_round2()
+        self.assertEqual(code, 1, out)
+        self.assertIn("REV-999", out)
+
+    def test_round2_subset_flow_completes(self):
+        self.to_round2_candidate()
+        self.write_round2_changes(
+            [
+                {"path": "docs/base.md", "finding_ids": ["REV-001"]},
+                {"path": "docs/extra.md", "finding_ids": ["REV-004"]},
+                {"path": "docs/third.md", "finding_ids": ["REV-004"]},
+            ]
+        )
+        code, out = self.check_round2()
+        self.assertEqual(code, 0, out)
+        code, out = self.p.run("diff", "--run", "run-1", "--round", "2")
+        self.assertEqual(code, 0, out)
+        verification = {
+            "schema_version": 1,
+            "run_id": "run-1",
+            "round": 2,
+            "phase": "verification",
+            "base_manifest_hash": sha_file(
+                self.p.run_dir() / "rounds" / "02" / "candidate-manifest.json"
+            ),
+            "criteria": {
+                "checklist_version": self.p.checklist["version"],
+                "checklist_sha256": sha_file(self.p.root / "checklist.json"),
+            },
+            "reviewer": "reviewer-test",
+            "model": "test-model",
+            "reviewed_paths": list(self.p.inputs),
+            "unreviewed": [],
+            "checklist_coverage": [
+                {"item_id": "R-01", "status": "checked"},
+                {"item_id": "R-02", "status": "checked"},
+            ],
+            "findings": [],
+            "resolution_checks": [
+                {"finding_id": "REV-004", "status": "resolved", "note": "ок"}
+            ],
+            "summary": {"verdict": "no_findings", "coverage": "complete", "note": ""},
+        }
+        code, out = self.p.run(
+            "record-review",
+            "--run",
+            "run-1",
+            "--round",
+            "2",
+            "--phase",
+            "verification",
+            "--file",
+            self.p.submit("verification2.json", verification),
+        )
+        self.assertEqual(code, 0, out)
+        approval = {
+            "schema_version": 1,
+            "run_id": "run-1",
+            "round": 2,
+            "decision_maker": "dm",
+            "confirmation_basis": "интерактивно (тест)",
+            "decision": "approve",
+            "reason": "принято",
+            "base_manifest_hash": self.p.manifest_hash(),
+            "candidate_manifest_hash": sha_file(
+                self.p.run_dir() / "rounds" / "02" / "candidate-manifest.json"
+            ),
+            "diff_sha256": sha_file(self.p.run_dir() / "rounds" / "02" / "diff.patch"),
+            "verification_hash": sha_file(
+                self.p.run_dir() / "rounds" / "02" / "verification.json"
+            ),
+            "residual_findings": ["REV-003 (deferred)"],
+            "permitted_actions": ["apply_changes"],
+        }
+        code, out = self.p.run(
+            "record-approval",
+            "--run",
+            "run-1",
+            "--round",
+            "2",
+            "--file",
+            self.p.submit("approval2.json", approval),
+        )
+        self.assertEqual(code, 0, out)
+        code, out = self.p.run("summary", "--run", "run-1")
+        self.assertEqual(code, 0, out)
+        text = (self.p.run_dir() / "summary.md").read_text(encoding="utf-8")
+        self.assertIn("**completed**", text)
+
+
 if __name__ == "__main__":
     unittest.main()

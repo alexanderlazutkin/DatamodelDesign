@@ -27,7 +27,7 @@ import tempfile
 from datetime import datetime, timezone
 from pathlib import Path, PurePosixPath
 
-HELPER_VERSION = "0.1.0"
+HELPER_VERSION = "0.1.1"
 SCHEMA_VERSION = 1
 DEFAULT_ROOT = Path(__file__).resolve().parent.parent
 RUNS_SUBDIR = PurePosixPath("wrk/review-runs")
@@ -601,16 +601,43 @@ def cmd_check(root: Path, args) -> int:
             changed.append(rel)
 
     if n > 1:
-        prev_root = round_dir(run, n - 1) / "candidate"
         prev_manifest = load_json_file(
             round_dir(run, n - 1) / "candidate-manifest.json"
         )
+        # файлы, уже числившиеся изменёнными по итогам раунда n-1:
+        # отличаются от исходного снимка или от кандидата раунда n-2
+        # (того же состава, что список changed, который helper вычислял
+        # для раунда n-1)
+        snap_sha = {f["path"]: f["sha256"] for f in manifest["files"]}
+        prev_sha = {f["path"]: f["sha256"] for f in prev_manifest["files"]}
+        before_sha = snap_sha
+        if n > 2:
+            before_prev = load_json_file(
+                round_dir(run, n - 2) / "candidate-manifest.json"
+            )
+            before_sha = {f["path"]: f["sha256"] for f in before_prev["files"]}
+        already_changed = {
+            p
+            for p in prev_sha
+            if prev_sha[p] != snap_sha.get(p) or prev_sha[p] != before_sha.get(p)
+        }
+        # принятые замечания предыдущих раундов: допустимы как атрибуция
+        # для файлов, изменённых до текущего раунда (раунд n может править
+        # подмножество файлов раунда n-1 — остальные обязаны числиться
+        # в changes.json с ID своих раундов)
+        prev_accepted = set()
+        for k in range(1, n):
+            prev_accepted.update(accepted_findings(load_round_decisions(run, k)))
+        prev_root = round_dir(run, n - 1) / "candidate"
         for f in prev_manifest["files"]:
             if (cand_root / f["path"]).read_bytes() != (
                 prev_root / f["path"]
             ).read_bytes():
                 if f["path"] not in changed:
                     changed.append(f["path"])
+    else:
+        already_changed = set()
+        prev_accepted = set()
 
     changes_path = round_dir(run, n) / "changes.json"
     if changed:
@@ -643,10 +670,19 @@ def cmd_check(root: Path, args) -> int:
             if not isinstance(ids, list) or not ids:
                 raise ReviewError(f"changes.json: пустые finding_ids для {path}")
             for fid in ids:
-                if fid not in accepted:
+                if fid in accepted:
+                    continue
+                if path in already_changed and fid in prev_accepted:
+                    continue
+                if path in already_changed:
                     raise ReviewError(
-                        f"changes.json: ID {fid} не входит в принятые замечания раунда {n}"
+                        f"changes.json: ID {fid} не входит в принятые замечания "
+                        f"раунда {n} и в принятые замечания предыдущих раундов "
+                        f"(файл {path} изменён до текущего раунда)"
                     )
+                raise ReviewError(
+                    f"changes.json: ID {fid} не входит в принятые замечания раунда {n}"
+                )
             listed[path] = ids
         unlisted = [p for p in changed if p not in listed]
         if unlisted:
