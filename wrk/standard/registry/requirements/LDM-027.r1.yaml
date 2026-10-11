@@ -32,4 +32,4 @@ relations:
     - LDM-023
   refines: []
   replaces: null
-status: draft
+status: approved

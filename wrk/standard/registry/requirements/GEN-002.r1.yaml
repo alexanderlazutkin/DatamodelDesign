@@ -35,5 +35,5 @@ based_on: []
 relations:
   depends_on: []
   refines: []
-  replaces: CDM-041
-status: draft
+  replaces: [CDM-041, LDM-038]
+status: approved

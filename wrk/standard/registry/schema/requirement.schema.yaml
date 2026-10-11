@@ -1,4 +1,7 @@
-# Схема записи требования (прил. А С01 v0.8; ПВ-03, этап Д2)
+# Схема записи требования (прил. А С01 v0.8; ПВ-03, этап Д2).
+# Ревизия 1.1 (Р-017, std-003 REV-001/REV-002): replaces допускает список ID —
+# при объединении нескольких исходных записей в одну (GEN) machine-readably
+# перечисляются все предки; судьба исходных ID дополнительно ведётся в прил. Ф.
 # Форма: JSON Schema draft 2020-12, носитель YAML (решение Д2, Р-012).
 # Комментарии в схеме — для рецензентов; валидатор их игнорирует.
 #
@@ -9,7 +12,7 @@
 #  - несколько значений оси — дизъюнкция; несколько осей — конъюнкция;
 #  - пустой список значений оси не используется.
 $schema: https://json-schema.org/draft/2020-12/schema
-$id: https://std.local/registry/requirement-1.schema.yaml
+$id: https://std.local/registry/requirement-1.1.schema.yaml
 title: Запись требования реестра (прил. А)
 type: object
 additionalProperties: false
@@ -124,12 +127,18 @@ properties:
       refines:
         $ref: '#/$defs/idList'
       replaces:
-        # заменяет прежнюю запись того же пространства (наследование ID при пересмотре);
-        # режимные связи AS-IS ведутся в матрице применения, не здесь
+        # заменяет прежнюю запись того же пространства (наследование ID при
+        # пересмотре); список (>= 2) — при объединении нескольких исходных ID
+        # в одну запись (Р-017); режимные связи AS-IS ведутся в матрице
+        # применения, не здесь
         oneOf:
           - type: 'null'
           - type: string
             pattern: '^(GEN|CDM|LDM)-[0-9]{3,4}$'
+          - type: array
+            minItems: 2
+            uniqueItems: true
+            items: {type: string, pattern: '^(GEN|CDM|LDM)-[0-9]{3,4}$'}
         default: null
   status:
     enum: [draft, approved, withdrawn]

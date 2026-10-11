@@ -32,4 +32,4 @@ relations:
   depends_on: []
   refines: []
   replaces: null
-status: draft
+status: approved

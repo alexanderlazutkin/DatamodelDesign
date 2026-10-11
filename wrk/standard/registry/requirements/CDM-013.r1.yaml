@@ -16,7 +16,7 @@ applies_to:
   mode: [to-be, as-is]
   stage: [3]
 conditions:
-  - для понятия используется бизнес-идентификатор
+  - понятие использует бизнес-идентификатор (номер, код или иное обозначение)
 exception_allowed: true
 verify:
   kind: semantic
@@ -34,4 +34,4 @@ relations:
   depends_on: []
   refines: []
   replaces: null
-status: draft
+status: approved

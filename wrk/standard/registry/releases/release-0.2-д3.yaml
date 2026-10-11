@@ -5,7 +5,7 @@ schema_version: 1
 record: standard_release
 release: "0.2-д3"
 date: "2026-10-11"
-status: draft
+status: approved
 includes:
   requirements:
     - {id: GEN-001, revision: 1}
@@ -44,7 +44,7 @@ includes:
     - {id: LDM-037, revision: 1}
     - {id: LDM-039, revision: 1}
   components:
-    - {ref: schema, version: "1"}
+    - {ref: schema, version: "1.1"}
     - {ref: "Структура стандарта (С01)", version: "0.8"}
     - {ref: "Глоссарий (С04)", version: "1.0"}
     - {ref: "Правила переноса Б1–Б5 (Проба переноса)", version: "0.1 (Р-014)"}

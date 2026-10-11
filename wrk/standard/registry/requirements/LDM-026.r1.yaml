@@ -33,4 +33,4 @@ relations:
     - CDM-032
   refines: []
   replaces: null
-status: draft
+status: approved
