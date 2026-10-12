@@ -1,0 +1,31 @@
+# Выделение нормы из практики применения (Д7-остатки полного выпуска,
+# Р-028): раздел 7.11 Стандарта 0.6. Обязательства — все профили
+# (ПВ-02, Р-010); условная применимость — в conditions.
+# Новая запись — draft до рецензирования контуром R.
+schema_version: 1
+id: LDM-041
+revision: 1
+formulation: >-
+  Описывать интервалы и их границы с правилами пересечения и разрывов.
+modality: required
+applies_to:
+  level: [LDM]
+  mode: [to-be, as-is]
+  stage: [5]
+conditions:
+  - в охват модели входят интервальные данные
+exception_allowed: true
+verify:
+  kind: documentary
+  criterion: >-
+    Для интервалов определены границы и правила пересечения и разрывов.
+  procedure: null
+  evidence: [модель, описания интервалов]
+sources:
+  - {doc: "Стандарт 0.6, раздел 7.11 (практика применения)", clause: "7.11"}
+based_on: []
+relations:
+  depends_on: []
+  refines: []
+  replaces: null
+status: draft

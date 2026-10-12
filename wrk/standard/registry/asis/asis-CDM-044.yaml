@@ -1,0 +1,10 @@
+# Матрица применения AS-IS, сводная на выпуск 0.7-д7.5 (Р-028): CDM-044.
+# Новое требование (выделено из практики применения); применяется в AS-IS без изменения.
+schema_version: 1
+record: asis_application
+standard_release: "0.7-д7.5"
+requirement: {id: CDM-044, revision: 1}
+way: unchanged
+relation_type: applies_as_is
+as_is_criterion: >-
+  Документы охвата смоделированы как бизнес-объекты: идентичность, версии, содержимое и связь с извлечёнными сведениями определены.

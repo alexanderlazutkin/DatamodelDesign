@@ -1,8 +1,8 @@
-# Матрица применения AS-IS, сводная на выпуск 0.6-д7.4 (волна 4 Д7, Р-024): LDM-002.
+# Матрица применения AS-IS, сводная на выпуск 0.7-д7.5 (Р-028): LDM-002.
 # Перенесено с выпусков 0.2-д3/0.4-д7.2/0.5-д7.3 без изменения способа применения.
 schema_version: 1
 record: asis_application
-standard_release: "0.6-д7.4"
+standard_release: "0.7-д7.5"
 requirement: {id: LDM-002, revision: 1}
 way: unchanged
 relation_type: applies_as_is

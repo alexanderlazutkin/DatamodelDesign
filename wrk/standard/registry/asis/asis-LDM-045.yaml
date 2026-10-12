@@ -1,0 +1,10 @@
+# Матрица применения AS-IS, сводная на выпуск 0.7-д7.5 (Р-028): LDM-045.
+# Новое требование (выделено из практики применения); применяется в AS-IS без изменения.
+schema_version: 1
+record: asis_application
+standard_release: "0.7-д7.5"
+requirement: {id: LDM-045, revision: 1}
+way: unchanged
+relation_type: applies_as_is
+as_is_criterion: >-
+  Документы определены с идентичностью, версиями, метаданными и связями с бизнес-объектами и извлечёнными данными.

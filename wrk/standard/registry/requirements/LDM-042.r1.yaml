@@ -1,0 +1,31 @@
+# Выделение нормы из практики применения (Д7-остатки полного выпуска,
+# Р-028): раздел 7.11 Стандарта 0.6. Обязательства — все профили
+# (ПВ-02, Р-010); условная применимость — в conditions.
+# Новая запись — draft до рецензирования контуром R.
+schema_version: 1
+id: LDM-042
+revision: 1
+formulation: >-
+  Фиксировать периодические снимки и наблюдения с указанием момента, к которому они относятся.
+modality: required
+applies_to:
+  level: [LDM]
+  mode: [to-be, as-is]
+  stage: [5]
+conditions:
+  - в охват модели входят периодические снимки либо наблюдения
+exception_allowed: true
+verify:
+  kind: documentary
+  criterion: >-
+    Для снимков и наблюдений указан момент, к которому они относятся.
+  procedure: null
+  evidence: [модель, описания снимков]
+sources:
+  - {doc: "Стандарт 0.6, раздел 7.11 (практика применения)", clause: "7.11"}
+based_on: []
+relations:
+  depends_on: []
+  refines: []
+  replaces: null
+status: draft
