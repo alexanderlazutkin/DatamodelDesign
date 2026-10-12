@@ -25,4 +25,4 @@ relations:
   depends_on: []
   refines: []
   replaces: [CDM-003, LDM-001]
-status: draft
+status: approved
