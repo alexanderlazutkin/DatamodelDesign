@@ -28,4 +28,4 @@ relations:
   depends_on: ["CDM-044"]
   refines: []
   replaces: null
-status: draft
+status: approved

@@ -28,4 +28,4 @@ relations:
   depends_on: ["LDM-006"]
   refines: []
   replaces: null
-status: draft
+status: approved
