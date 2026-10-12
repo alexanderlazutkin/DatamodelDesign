@@ -217,3 +217,38 @@ uv run python -m unittest discover -s tests -v
 
 Коды выхода: `0` — формальная проверка пройдена (не утверждение содержания);
 `1` — нарушения; `2` — ошибки входов/среды.
+
+## tools/nav.py — навигация комплекта (Р-041)
+
+Вставка block-ID якорей (`^T-xxx`, `^GEN|CDM|LDM-xxx`, `^PR-xxx`), конвертация
+плоских отсылок в wikilink Obsidian (первое упоминание в разделе `##`) и проверка
+резолва всех ссылок/якорей. Правила — `wrk/standard/Правила оформления и навигации.md`.
+
+```bash
+uv run python tools/nav.py anchors   # вставка якорей (идемпотентно)
+uv run python tools/nav.py linkify   # плоские отсылки -> wikilink
+uv run python tools/nav.py check     # резолв ссылок; код 1 — ошибка приёмки
+```
+
+Ограничения: строки-определения (`^ID`) не линкуются (дословность формулировок);
+не линкуются диапазоны, слэш-перечисления, таблицы, код, С01–С09, `Р-xxx`, `Q-*.x`.
+
+## tools/build_docx.py — единый .docx комплекта (Р-041)
+
+Сборка нормативного комплекта в один .docx со сквозной навигацией: титул →
+содержание → Стандарт → Регламент → приложения А…Ф → словарь. Wikilink-цели
+получают закладки Word, ссылки становятся внутренними гиперссылками (Ctrl+клик).
+
+```bash
+uv run --with python-docx python tools/build_docx.py --out dist/Комплект_стандарта.docx
+uv run --with python-docx python tools/build_docx.py --verify dist/Комплект_стандарта.docx
+```
+
+Артефакт — `dist/` (вне Git, пересобирается). Ошибка сборки (неразрешимая ссылка)
+— код выхода 1.
+
+## Тесты
+
+```bash
+uv run --with jsonschema --with python-docx python -m unittest discover -s tests
+```
