@@ -228,6 +228,7 @@ uv run python -m unittest discover -s tests -v
 uv run python tools/nav.py anchors   # вставка якорей (идемпотентно)
 uv run python tools/nav.py linkify   # плоские отсылки -> wikilink
 uv run python tools/nav.py check     # резолв ссылок; код 1 — ошибка приёмки
+uv run python tools/nav.py guard     # откат whitespace-артефактов таблиц (Obsidian); код 1 — есть содержательные изменения
 ```
 
 Ограничения: строки-определения (`^ID`) не линкуются (дословность формулировок);

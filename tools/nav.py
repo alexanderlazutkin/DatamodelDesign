@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import argparse
 import re
+import subprocess
 import sys
 from pathlib import Path
 
@@ -31,6 +32,7 @@ FENCE = re.compile(r"^```")
 HEADING = re.compile(r"^(#{1,6})\s+(.+?)\s*$")
 H2 = re.compile(r"^##\s")
 TABLE_ROW = re.compile(r"^\s*\|")
+SEP_ROW = re.compile(r"^\s*\|[\s:|-]+\|\s*$")
 WIKILINK = re.compile(r"\[\[([^\[\]]+?)\]\]")
 INLINE_CODE = re.compile(r"`[^`]*`")
 PARA_ANCHOR = re.compile(r"\^([A-Za-z][\w-]*)\s*$")
@@ -405,9 +407,96 @@ def cmd_check(root: Path) -> list[str]:
     return errors
 
 
+# ---------------------------------------------------------------- whitespace-guard
+
+INLINE_STASH = re.compile(r"`[^`]*`")
+
+
+def normalize_md(text: str) -> str:
+    """Нормализация для сравнения: свёртка пробелов вне кода, канонизация
+    разделителей таблиц. Авто-форматтер Obsidian меняет только выравнивание
+    (пробелы/длину разделительной строки) — нормализованные версии совпадают.
+    """
+    out: list[str] = []
+    fenced = False
+    for line in text.splitlines():
+        if FENCE.match(line):
+            fenced = not fenced
+            out.append(line.rstrip())
+            continue
+        if fenced:
+            out.append(line)  # код-блок: значимые пробелы не трогаем
+            continue
+        if TABLE_ROW.match(line) and SEP_ROW.match(line):
+            n = line.count("|")
+            out.append("|" + "---|" * (n - 1))
+            continue
+        stash: list[str] = []
+
+        def _put(m: re.Match) -> str:
+            stash.append(m.group(0))
+            return f"\x01{len(stash) - 1}\x01"
+
+        s = INLINE_STASH.sub(_put, line.rstrip())
+        s = re.sub(r"  +", " ", s)
+        s = re.sub(r"\x01(\d+)\x01", lambda m: stash[int(m.group(1))], s)
+        out.append(s)
+    return "\n".join(out).strip("\n") + ("\n" if out else "")
+
+
+def _git(root: Path, *args: str) -> subprocess.CompletedProcess:
+    return subprocess.run(
+        ["git", "-C", str(root), *args], capture_output=True, text=True
+    )
+
+
+def cmd_guard(root: Path, dry: bool = False) -> int:
+    """Whitespace-guard: откат whitespace-артефактов форматирования таблиц.
+
+    Авто-форматтер Obsidian выравнивает таблицы пробелами (содержание не меняет).
+    По прецеденту п. 5 реестра источников такие правки откатываются из Git.
+    Файл откатывается ТОЛЬКО если нормализованные версии HEAD и рабочей копии
+    совпадают (изменения только пробельные); содержательные изменения остаются.
+    Код выхода: 0 — артефактов нет/откачены; 1 — остались содержательные изменения.
+    """
+    docs = kit_docs(root)
+    reverted: list[str] = []
+    kept: list[str] = []
+    missing_head: list[str] = []
+    for doc in docs:
+        rel = doc.path.relative_to(root).as_posix()
+        show = _git(root, "show", f"HEAD:{rel}")
+        if show.returncode != 0:
+            if doc.path.exists():
+                missing_head.append(rel)
+            continue
+        head = show.stdout
+        try:
+            work = doc.read()
+        except FileNotFoundError:
+            kept.append(rel + " (удалён)")
+            continue
+        if work == head:
+            continue
+        if normalize_md(work) == normalize_md(head):
+            if not dry:
+                _git(root, "checkout", "--", rel)
+            reverted.append(rel)
+        else:
+            kept.append(rel)
+    for rel in reverted:
+        print(f"guard: откат whitespace-артефакта: {rel}")
+    for rel in missing_head:
+        print(f"guard: без версии в HEAD (новый): {rel}")
+    for rel in kept:
+        print(f"guard: СОДЕРЖАТЕЛЬНЫЕ ИЗМЕНЕНИЯ (оставлено): {rel}")
+    print(f"guard: откатов {len(reverted)}, содержательных {len(kept)}")
+    return 1 if kept else 0
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("command", choices=("anchors", "linkify", "check"))
+    parser.add_argument("command", choices=("anchors", "linkify", "check", "guard"))
     parser.add_argument(
         "--root", type=Path, default=Path(__file__).resolve().parents[1]
     )
@@ -419,6 +508,8 @@ def main(argv: list[str] | None = None) -> int:
     if args.command == "linkify":
         cmd_linkify(args.root, dry=args.dry)
         return 0
+    if args.command == "guard":
+        return cmd_guard(args.root, dry=args.dry)
     return 1 if cmd_check(args.root) else 0
 
 

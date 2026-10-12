@@ -246,3 +246,96 @@ class NavFixtureTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class GuardNormalizeTest(unittest.TestCase):
+    """Нормализация: свёртка пробелов, канонизация разделителей, код не трогаем."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.nav = load_module()
+
+    def test_padding_collapsed(self):
+        a = self.nav.normalize_md("| Ячейка        | Значение   |\n| текст         | ещё        |")
+        b = self.nav.normalize_md("| Ячейка | Значение |\n| текст | ещё |")
+        self.assertEqual(a, b)
+
+    def test_separator_canonicalized(self):
+        a = self.nav.normalize_md("| Реквизит | Значение |\n| -------------------------- | --------- |\n| a | b |")
+        b = self.nav.normalize_md("| Реквизит | Значение |\n|---|---|\n| a | b |")
+        self.assertEqual(a, b)
+
+    def test_trailing_spaces_ignored(self):
+        a = self.nav.normalize_md("текст строки   \nвторая\t")
+        b = self.nav.normalize_md("текст строки\nвторая")
+        self.assertEqual(a, b)
+
+    def test_code_block_untouched(self):
+        # значимые пробелы в коде не сворачиваются
+        a = self.nav.normalize_md("```\n  отступ  два  пробела\n```")
+        self.assertIn("  отступ  два  пробела", a)
+
+    def test_content_change_detected(self):
+        a = self.nav.normalize_md("| Ячейка | Значение |")
+        b = self.nav.normalize_md("| Ячейка | Другое |")
+        self.assertNotEqual(a, b)
+
+    def test_inline_code_spaces_kept(self):
+        a = self.nav.normalize_md("строка с `кодом  из  двух` пробелами")
+        self.assertIn("`кодом  из  двух`", a)
+
+
+@unittest.skipUnless(
+    __import__("subprocess").run(["git", "--version"], capture_output=True).returncode == 0,
+    "git недоступен",
+)
+class GuardRepoTest(unittest.TestCase):
+    """guard: whitespace-артефакт откатывается, содержательное изменение остаётся."""
+
+    @classmethod
+    def setUpClass(cls):
+        import subprocess
+
+        cls.nav = load_module()
+        cls.tmp = tempfile.TemporaryDirectory()
+        cls.root = Path(cls.tmp.name)
+        make_kit(cls.root)
+        subprocess.run(["git", "init", "-q"], cwd=cls.root, check=True)
+        subprocess.run(
+            ["git", "add", "wrk"],
+            cwd=cls.root, check=True, capture_output=True,
+        )
+        subprocess.run(
+            ["git", "-c", "user.email=t@t", "-c", "user.name=t", "commit", "-qm", "kit"],
+            cwd=cls.root, check=True, capture_output=True,
+        )
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.tmp.cleanup()
+
+    def test_artifact_reverted(self):
+        import subprocess
+
+        f = self.root / "wrk" / "standard" / "Стандарт.md"
+        original = f.read_text(encoding="utf-8")
+        f.write_text(
+            original.replace("| Колонка | Значение |", "| Колонка          | Значение |")
+                      .replace("|---|---|", "| ------------- | --------- |"),
+            encoding="utf-8",
+        )
+        rc = self.nav.cmd_guard(self.root)
+        self.assertEqual(subprocess.run(["git", "-C", str(self.root), "status", "--porcelain", "wrk"], capture_output=True).stdout.decode().strip(), "")
+        self.assertEqual(f.read_text(encoding="utf-8"), original)
+        self.assertEqual(rc, 0)
+
+    def test_content_change_kept(self):
+        f = self.root / "wrk" / "standard" / "Стандарт.md"
+        original = f.read_text(encoding="utf-8")
+        try:
+            f.write_text(original.replace("Второй раздел", "Второй раздел (правка)"), encoding="utf-8")
+            rc = self.nav.cmd_guard(self.root)
+            self.assertEqual(rc, 1)  # содержательное изменение осталось
+            self.assertIn("(правка)", f.read_text(encoding="utf-8"))
+        finally:
+            f.write_text(original, encoding="utf-8")
