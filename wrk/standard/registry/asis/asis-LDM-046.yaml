@@ -2,7 +2,7 @@
 # Новое требование (выделено из практики применения); применяется в AS-IS без изменения.
 schema_version: 1
 record: asis_application
-standard_release: "0.7-д7.5"
+standard_release: "0.8-д7.6"
 requirement: {id: LDM-046, revision: 1}
 way: unchanged
 relation_type: applies_as_is

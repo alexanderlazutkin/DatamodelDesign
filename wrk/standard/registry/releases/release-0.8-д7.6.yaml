@@ -1,0 +1,107 @@
+# Манифест выпуска стандарта 0.8 (Р-032: специальный порядок AS-IS перенесён
+# в регламент 0.2 из раздела 9 Стандарта по 3.9, без изменения обязательств).
+# Состав требований не меняется: 92 approved. На рецензировании (std-011).
+schema_version: 1
+record: standard_release
+release: "0.8-д7.6"
+date: "2026-10-12"
+status: draft
+includes:
+  requirements:
+    - {id: CDM-001, revision: 1}
+    - {id: CDM-004, revision: 1}
+    - {id: CDM-005, revision: 1}
+    - {id: CDM-006, revision: 1}
+    - {id: CDM-007, revision: 1}
+    - {id: CDM-008, revision: 1}
+    - {id: CDM-009, revision: 1}
+    - {id: CDM-010, revision: 1}
+    - {id: CDM-011, revision: 1}
+    - {id: CDM-012, revision: 1}
+    - {id: CDM-013, revision: 1}
+    - {id: CDM-014, revision: 1}
+    - {id: CDM-015, revision: 1}
+    - {id: CDM-016, revision: 1}
+    - {id: CDM-017, revision: 1}
+    - {id: CDM-018, revision: 1}
+    - {id: CDM-019, revision: 1}
+    - {id: CDM-020, revision: 1}
+    - {id: CDM-021, revision: 1}
+    - {id: CDM-022, revision: 1}
+    - {id: CDM-023, revision: 1}
+    - {id: CDM-024, revision: 1}
+    - {id: CDM-025, revision: 1}
+    - {id: CDM-026, revision: 1}
+    - {id: CDM-027, revision: 1}
+    - {id: CDM-028, revision: 1}
+    - {id: CDM-029, revision: 1}
+    - {id: CDM-030, revision: 1}
+    - {id: CDM-031, revision: 1}
+    - {id: CDM-032, revision: 1}
+    - {id: CDM-033, revision: 1}
+    - {id: CDM-034, revision: 1}
+    - {id: CDM-035, revision: 1}
+    - {id: CDM-036, revision: 1}
+    - {id: CDM-037, revision: 1}
+    - {id: CDM-038, revision: 1}
+    - {id: CDM-039, revision: 1}
+    - {id: CDM-040, revision: 1}
+    - {id: CDM-042, revision: 1}
+    - {id: CDM-043, revision: 1}
+    - {id: CDM-044, revision: 1}
+    - {id: GEN-001, revision: 1}
+    - {id: GEN-002, revision: 1}
+    - {id: GEN-003, revision: 1}
+    - {id: GEN-004, revision: 1}
+    - {id: GEN-005, revision: 1}
+    - {id: GEN-006, revision: 1}
+    - {id: GEN-007, revision: 1}
+    - {id: GEN-008, revision: 1}
+    - {id: LDM-002, revision: 1}
+    - {id: LDM-003, revision: 1}
+    - {id: LDM-004, revision: 1}
+    - {id: LDM-005, revision: 1}
+    - {id: LDM-006, revision: 1}
+    - {id: LDM-007, revision: 1}
+    - {id: LDM-008, revision: 1}
+    - {id: LDM-009, revision: 1}
+    - {id: LDM-010, revision: 1}
+    - {id: LDM-011, revision: 1}
+    - {id: LDM-012, revision: 1}
+    - {id: LDM-013, revision: 1}
+    - {id: LDM-014, revision: 1}
+    - {id: LDM-015, revision: 1}
+    - {id: LDM-016, revision: 1}
+    - {id: LDM-017, revision: 1}
+    - {id: LDM-018, revision: 1}
+    - {id: LDM-019, revision: 1}
+    - {id: LDM-020, revision: 1}
+    - {id: LDM-021, revision: 1}
+    - {id: LDM-022, revision: 1}
+    - {id: LDM-023, revision: 1}
+    - {id: LDM-024, revision: 1}
+    - {id: LDM-025, revision: 1}
+    - {id: LDM-026, revision: 1}
+    - {id: LDM-027, revision: 1}
+    - {id: LDM-028, revision: 1}
+    - {id: LDM-030, revision: 1}
+    - {id: LDM-031, revision: 1}
+    - {id: LDM-032, revision: 1}
+    - {id: LDM-033, revision: 1}
+    - {id: LDM-034, revision: 1}
+    - {id: LDM-035, revision: 1}
+    - {id: LDM-036, revision: 1}
+    - {id: LDM-037, revision: 1}
+    - {id: LDM-039, revision: 1}
+    - {id: LDM-040, revision: 1}
+    - {id: LDM-041, revision: 1}
+    - {id: LDM-042, revision: 1}
+    - {id: LDM-043, revision: 1}
+    - {id: LDM-044, revision: 1}
+    - {id: LDM-045, revision: 1}
+    - {id: LDM-046, revision: 1}
+  components:
+    - {ref: schema, version: "1.1"}
+    - {ref: "Стандарт.md (рабочая редакция)", version: "0.8 (раздел 9 — якорная карта, Р-032)"}
+    - {ref: "Регламент AS-IS", version: "0.2 (специальный порядок 4.1–4.11; на рецензировании std-011)"}
+    - {ref: "матрица применения AS-IS (registry/asis/)", version: "90 строк, сводная на 0.8-д7.6"}

@@ -2,7 +2,7 @@
 # Перенесено с выпусков 0.2-д3/0.4-д7.2/0.5-д7.3 без изменения способа применения.
 schema_version: 1
 record: asis_application
-standard_release: "0.7-д7.5"
+standard_release: "0.8-д7.6"
 requirement: {id: GEN-007, revision: 1}
 way: unchanged
 relation_type: applies_as_is
