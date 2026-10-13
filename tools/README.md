@@ -239,6 +239,7 @@ uv run python tools/nav.py guard     # откат whitespace-артефакто�
 Сборка нормативного комплекта в один .docx со сквозной навигацией: титул →
 содержание → Стандарт → Регламент → приложения А…Ф → словарь. Wikilink-цели
 получают закладки Word, ссылки становятся внутренними гиперссылками (Ctrl+клик).
+Диаграммы ```mermaid отрисовываются в PNG и вставляются картинками (Р-048).
 
 ```bash
 uv run --with python-docx python tools/build_docx.py --out dist/Комплект_стандарта.docx
@@ -247,6 +248,12 @@ uv run --with python-docx python tools/build_docx.py --verify dist/Компле�
 
 Артефакт — `dist/` (вне Git, пересобирается). Ошибка сборки (неразрешимая ссылка)
 — код выхода 1.
+
+Рендер Mermaid (Р-048): mermaid-cli (`npx -y @mermaid-js/mermaid-cli`), Chrome
+ищется по `MMDC_CHROME`/`CHROME_PATH`, затем в кэше puppeteer; переопределение
+биндари — `MMDC_BIN`. PNG кэшируются по SHA-256 кода диаграммы в
+`wrk/tmp/mermaid-cache/` (вне Git) — повторная сборка без перерисовки. При сбое
+рендера блок вставляется кодом, в stderr — ПРЕДУПРЕЖДЕНИЕ (код выхода не меняется).
 
 ## Тесты
 

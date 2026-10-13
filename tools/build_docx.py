@@ -4,7 +4,10 @@
 
 Сборка: титул → содержание → Стандарт → Регламент AS-IS → приложения А…Ф → словарь терминов.
 Каждая wikilink-цель (заголовок, block-ID) получает закладку Word; ссылки становятся
-внутренними гиперссылками (Ctrl+клик). Верификация: каждая гиперссылка имеет закладку.
+внутренними гиперссылками (Ctrl+клик). Диаграммы ```mermaid отрисовываются в PNG
+(mermaid-cli, кэш wrk/tmp/mermaid-cache) и вставляются картинками; при сбое рендера
+блок вставляется кодом с предупреждением (Р-048). Верификация: каждая гиперссылка
+имеет закладку.
 
 Запуск:
   uv run --with python-docx python tools/build_docx.py --out dist/Комплект_стандарта.docx
@@ -14,7 +17,11 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
+import json
+import os
 import re
+import subprocess
 import sys
 from dataclasses import dataclass, field
 from datetime import date
@@ -32,6 +39,7 @@ RU_APPENDIX_ORDER = "АБВГДЕЖИКЛМНПРСТУФ"
 
 HEADING = re.compile(r"^(#{1,6})\s+(.+?)\s*$")
 FENCE = re.compile(r"^```")
+FENCE_LANG = re.compile(r"^```([\w-]+)?\s*$")
 TABLE = re.compile(r"^\s*\|")
 SEP_ROW = re.compile(r"^\s*\|[\s:|-]+\|\s*$")
 LIST_RE = re.compile(r"^(\s*)([-*]|\d+\.)\s+(.*)$")
@@ -82,6 +90,7 @@ class Block:
     text: str = ""
     ordered: bool = False
     indent: int = 0
+    lang: str | None = None  # язык fence-блока (```mermaid → "mermaid")
 
 
 @dataclass
@@ -178,6 +187,7 @@ def parse_md(text: str) -> list[Block]:
     para_buf: list[str] = []
     table_buf: list[tuple[str, str | None]] = []
     code_buf: list[str] = []
+    code_lang: str | None = None
     fenced = False
 
     def flush_para():
@@ -207,11 +217,14 @@ def parse_md(text: str) -> list[Block]:
     for line in text.splitlines():
         if FENCE.match(line):
             if fenced:
-                blocks.append(Block("code", text="\n".join(code_buf)))
+                blocks.append(Block("code", text="\n".join(code_buf), lang=code_lang))
                 code_buf.clear()
+                code_lang = None
             else:
                 flush_para()
                 flush_table()
+                m = FENCE_LANG.match(line)
+                code_lang = m.group(1) if m else None
             fenced = not fenced
             continue
         if fenced:
@@ -334,13 +347,63 @@ def bookmark_name_for(block_id: str) -> str:
     return "a_" + block_id.replace("-", "_")
 
 
+def find_chrome() -> str | None:
+    """Путь к Chrome для mermaid-cli: MMDC_CHROME/CHROME_PATH либо кэш puppeteer."""
+    env = os.environ.get("MMDC_CHROME") or os.environ.get("CHROME_PATH")
+    if env and Path(env).exists():
+        return env
+    base = Path.home() / ".cache" / "puppeteer" / "chrome"
+    if base.is_dir():
+        cands = sorted(base.glob("*/chrome-linux64/chrome")) or sorted(
+            base.glob("*/chrome-linux/chrome")
+        )
+        if cands:
+            return str(cands[-1])
+    return None
+
+
+def render_mermaid(code: str, cache_dir: Path) -> tuple[Path | None, str | None]:
+    """PNG для mermaid-диаграммы; кэш по SHA-256 кода (Р-048).
+
+    Возвращает (путь, None) при успехе и (None, диагностика) при сбое —
+    вызывающий код тогда вставляет блок кодом с предупреждением.
+    """
+    digest = hashlib.sha256(code.encode("utf-8")).hexdigest()[:16]
+    png = cache_dir / f"mmd-{digest}.png"
+    if png.exists():
+        return png, None
+    try:
+        cache_dir.mkdir(parents=True, exist_ok=True)
+        mmd = cache_dir / f"mmd-{digest}.mmd"
+        mmd.write_text(code, encoding="utf-8")
+        cmd = os.environ.get("MMDC_BIN", "npx -y @mermaid-js/mermaid-cli").split()
+        cmd += ["-i", str(mmd), "-o", str(png), "-b", "white", "-s", "2"]
+        chrome = find_chrome()
+        if chrome:
+            cfg = cache_dir / "pptr.json"
+            cfg.write_text(
+                json.dumps({"executablePath": chrome, "args": ["--no-sandbox"]}),
+                encoding="utf-8",
+            )
+            cmd += ["-p", str(cfg)]
+        env = dict(os.environ, PUPPETEER_SKIP_DOWNLOAD="1")
+        proc = subprocess.run(cmd, capture_output=True, text=True, timeout=180, env=env)
+        if png.exists() and png.stat().st_size > 0:
+            return png, None
+        return None, (proc.stderr or proc.stdout or "пустой вывод mmdc").strip()[-200:]
+    except Exception as exc:  # noqa: BLE001 — диагностика в предупреждение сборки
+        return None, f"{type(exc).__name__}: {exc}"
+
+
 class Builder:
-    def __init__(self, doc: Document):
+    def __init__(self, doc: Document, mermaid_cache: Path | None = None):
         self.doc = doc
         self.bmk = 0
         self.by_stem: dict[str, DocKit] = {}
         self.problems: list[str] = []
         self.heading_no: dict[int, int] = {}
+        self.mermaid_cache = mermaid_cache
+        self.warnings: list[str] = []
 
     def add_bookmark(self, paragraph, name: str):
         self.bmk += 1
@@ -477,6 +540,22 @@ class Builder:
             self.render_inline(p, b.inline)
             return
         if b.kind == "code":
+            if b.lang == "mermaid" and self.mermaid_cache is not None:
+                png, err = render_mermaid(b.text, self.mermaid_cache)
+                if png is not None:
+                    p = d.add_paragraph()
+                    p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+                    run = p.add_run()
+                    run.add_picture(str(png), width=Cm(16))
+                    cap = d.add_paragraph()
+                    cap.alignment = WD_ALIGN_PARAGRAPH.CENTER
+                    cr = cap.add_run("Диаграмма (Mermaid)")
+                    cr.italic = True
+                    cr.font.size = Pt(9)
+                    return
+                self.warnings.append(
+                    f"mermaid не отрисована: {err} — блок вставлен кодом"
+                )
             for ln in b.text.splitlines() or [""]:
                 p = d.add_paragraph()
                 p.paragraph_format.space_after = Pt(0)
@@ -515,13 +594,15 @@ class Builder:
             return
 
 
-def build(root: Path, out: Path, title: str, version: str) -> Path:
+def build(
+    root: Path, out: Path, title: str, version: str, report: list | None = None
+) -> Path:
     kits = kit_docs(root)
     if not kits:
         raise SystemExit("build: комплект не найден (wrk/standard/)")
     doc = Document()
     ensure_styles(doc)
-    b = Builder(doc)
+    b = Builder(doc, mermaid_cache=root / "wrk" / "tmp" / "mermaid-cache")
 
     # пасс 1: имена закладок по документам
     for kit in kits:
@@ -599,8 +680,13 @@ def build(root: Path, out: Path, title: str, version: str) -> Path:
     n_links = len(doc.element.body.findall(f".//{W}hyperlink"))
     n_bm = len(doc.element.body.findall(f".//{W}bookmarkStart"))
     print(
-        f"build: {out} — документов {len(kits)}, гиперссылок {n_links}, закладок {n_bm}"
+        f"build: {out} — документов {len(kits)}, гиперссылок {n_links},"
+        f" закладок {n_bm}, диаграмм-картинок {len(doc.inline_shapes)}"
     )
+    for warn in b.warnings:
+        print(f"build: ПРЕДУПРЕЖДЕНИЕ: {warn}", file=sys.stderr)
+    if report is not None:
+        report.extend(b.warnings)
     return out
 
 

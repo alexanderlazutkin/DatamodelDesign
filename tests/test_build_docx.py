@@ -6,8 +6,10 @@
 """
 
 import importlib.util
+import struct
 import tempfile
 import unittest
+import zlib
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -113,6 +115,164 @@ class BuildDocxTest(unittest.TestCase):
         text = "\n".join(p.text for p in Document(str(self.out)).paragraphs)
         self.assertIn("Содержание", text)
         self.assertIn("Стандарт", text)
+
+
+def _png_1px() -> bytes:
+    """Валидный PNG 1x1 (RGBA) — собирается программно, без фиксации байтов."""
+
+    def chunk(ctype: bytes, data: bytes) -> bytes:
+        body = ctype + data
+        return struct.pack(">I", len(data)) + body + struct.pack(">I", zlib.crc32(body))
+
+    ihdr = struct.pack(">IIBBBBB", 1, 1, 8, 6, 0, 0, 0)
+    scanline = b"\x00" + b"\xff\xff\xff\xff"
+    return (
+        b"\x89PNG\r\n\x1a\n"
+        + chunk(b"IHDR", ihdr)
+        + chunk(b"IDAT", zlib.compress(scanline))
+        + chunk(b"IEND", b"")
+    )
+
+
+PNG_1PX = _png_1px()
+
+
+@unittest.skipUnless(
+    HAS_PYTHON_DOCX, "python-docx не установлен (uv run --with python-docx)"
+)
+class MermaidDocxTest(unittest.TestCase):
+    """Диаграммы Mermaid в .docx — картинки (Р-048), а не код-блоки."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.tmp = tempfile.TemporaryDirectory()
+        cls.nav = load_nav()
+        cls.root = Path(cls.tmp.name)
+        make_kit(cls.root)
+        std = cls.root / "wrk" / "standard" / "Стандарт.md"
+        std.write_text(
+            std.read_text(encoding="utf-8")
+            + "\n```mermaid\nerDiagram\n    A ||--o{ B : содержит\n```\n",
+            encoding="utf-8",
+        )
+        cls.mod = load_builder()
+        cls.png = Path(cls.tmp.name) / "fake.png"
+        cls.png.write_bytes(PNG_1PX)
+        cls.orig_render = cls.mod.render_mermaid
+        cls.mod.render_mermaid = lambda code, cache: (cls.png, None)
+        cls.out = Path(cls.tmp.name) / "mmd.docx"
+        cls.mod.build(cls.root, cls.out, title="М", version="0-тест")
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.mod.render_mermaid = cls.orig_render
+        cls.tmp.cleanup()
+
+    def test_fence_language_captured(self):
+        blocks = self.mod.parse_md("```mermaid\ngraph TD\n```\n")
+        self.assertEqual(blocks[0].kind, "code")
+        self.assertEqual(blocks[0].lang, "mermaid")
+        plain = self.mod.parse_md("```\ncode\n```\n")
+        self.assertIsNone(plain[0].lang)
+
+    def test_picture_embedded(self):
+        self.assertEqual(len(Document(str(self.out)).inline_shapes), 1)
+
+    def test_mermaid_code_not_emitted(self):
+        text = "\n".join(p.text for p in Document(str(self.out)).paragraphs)
+        self.assertNotIn("erDiagram", text)
+
+
+@unittest.skipUnless(
+    HAS_PYTHON_DOCX, "python-docx не установлен (uv run --with python-docx)"
+)
+class MermaidFallbackTest(unittest.TestCase):
+    """Сбой рендера Mermaid — блок вставляется кодом с предупреждением (Р-048)."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.tmp = tempfile.TemporaryDirectory()
+        cls.nav = load_nav()
+        cls.root = Path(cls.tmp.name)
+        make_kit(cls.root)
+        std = cls.root / "wrk" / "standard" / "Стандарт.md"
+        std.write_text(
+            std.read_text(encoding="utf-8")
+            + "\n```mermaid\nerDiagram\n    A ||--o{ B : содержит\n```\n",
+            encoding="utf-8",
+        )
+        cls.mod = load_builder()
+        cls.orig_render = cls.mod.render_mermaid
+        cls.mod.render_mermaid = lambda code, cache: (None, "mmdc недоступен")
+        cls.out = Path(cls.tmp.name) / "mmd-fb.docx"
+        cls.report = []
+        cls.mod.build(cls.root, cls.out, title="М", version="0-тест", report=cls.report)
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.mod.render_mermaid = cls.orig_render
+        cls.tmp.cleanup()
+
+    def test_code_fallback(self):
+        text = "\n".join(p.text for p in Document(str(self.out)).paragraphs)
+        self.assertIn("erDiagram", text)
+
+    def test_warning_reported(self):
+        self.assertTrue(self.report and "mermaid" in self.report[0].lower())
+
+
+@unittest.skipUnless(
+    HAS_PYTHON_DOCX, "python-docx не установлен (uv run --with python-docx)"
+)
+class RenderMermaidCacheTest(unittest.TestCase):
+    """Кэш рендера по SHA-256 кода диаграммы; сбой — (None, диагностика) (Р-048)."""
+
+    def test_cached_second_call(self):
+        mod = load_builder()
+        with tempfile.TemporaryDirectory() as td:
+            cache = Path(td)
+            calls = []
+
+            def fake_run(cmd, **kw):
+                calls.append(cmd)
+                out = Path(cmd[cmd.index("-o") + 1])
+                out.write_bytes(PNG_1PX)
+
+                class P:
+                    returncode = 0
+                    stderr = ""
+                    stdout = ""
+
+                return P()
+
+            orig = mod.subprocess.run
+            mod.subprocess.run = fake_run
+            try:
+                p1, e1 = mod.render_mermaid("graph TD; A-->B", cache)
+                p2, e2 = mod.render_mermaid("graph TD; A-->B", cache)
+            finally:
+                mod.subprocess.run = orig
+            self.assertIsNone(e1)
+            self.assertIsNone(e2)
+            self.assertEqual(p1, p2)
+            self.assertTrue(p1 and p1.exists())
+            self.assertEqual(len(calls), 1)
+
+    def test_failure_diagnosis(self):
+        mod = load_builder()
+        with tempfile.TemporaryDirectory() as td:
+
+            def boom(cmd, **kw):
+                raise FileNotFoundError("npx нет")
+
+            orig = mod.subprocess.run
+            mod.subprocess.run = boom
+            try:
+                png, err = mod.render_mermaid("graph TD; A-->B", Path(td))
+            finally:
+                mod.subprocess.run = orig
+            self.assertIsNone(png)
+            self.assertIn("npx", err)
 
 
 if __name__ == "__main__":
