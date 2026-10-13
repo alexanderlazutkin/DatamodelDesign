@@ -246,8 +246,9 @@ uv run --with python-docx python tools/build_docx.py --out dist/Комплект
 uv run --with python-docx python tools/build_docx.py --verify dist/Комплект_стандарта.docx
 ```
 
-Артефакт — `dist/` (вне Git, пересобирается). Ошибка сборки (неразрешимая ссылка)
-— код выхода 1.
+Артефакт — `dist/Комплект_стандарта.docx` **публикуется в Git** (Р-049): пересборка
+комплекта сопровождается коммитом артефакта; кэш PNG диаграмм (`wrk/tmp/mermaid-cache/`)
+остаётся вне Git. Ошибка сборки (неразрешимая ссылка) — код выхода 1.
 
 Рендер Mermaid (Р-048): mermaid-cli (`npx -y @mermaid-js/mermaid-cli`), Chrome
 ищется по `MMDC_CHROME`/`CHROME_PATH`, затем в кэше puppeteer; переопределение
