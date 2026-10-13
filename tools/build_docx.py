@@ -2,9 +2,9 @@
 # -*- coding: utf-8 -*-
 """tools/build_docx.py — единый .docx нормативного комплекта со сквозной навигацией (Р-041).
 
-Сборка: титул → содержание → Стандарт → Регламент AS-IS → приложения А…Ф → словарь терминов.
-Каждая wikilink-цель (заголовок, block-ID) получает закладку Word; ссылки становятся
-внутренними гиперссылками (Ctrl+клик). Диаграммы ```mermaid отрисовываются в PNG
+Сборка: титул → содержание → Стандарт (со словарём терминов в 2.1) → Регламент AS-IS →
+приложения А…Ф. Каждая wikilink-цель (заголовок, block-ID) получает закладку Word; ссылки
+становятся внутренними гиперссылками (Ctrl+клик). Диаграммы ```mermaid отрисовываются в PNG
 (mermaid-cli, кэш wrk/tmp/mermaid-cache) и вставляются картинками; при сбое рендера
 блок вставляется кодом с предупреждением (Р-048). Верификация: каждая гиперссылка
 имеет закладку.
@@ -290,7 +290,6 @@ def kit_docs(root: Path) -> list[DocKit]:
             k for k in files if k not in RU_APPENDIX_ORDER
         )
         plan += [(files[l], f"app{n}") for n, l in enumerate(ordered)]
-    plan.append((std / "registry" / "terms-draft.md", "terms"))
     kits = []
     for path, prefix in plan:
         if not path.exists():

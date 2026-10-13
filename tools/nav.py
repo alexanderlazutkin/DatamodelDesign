@@ -99,7 +99,6 @@ def kit_docs(root: Path) -> list[Doc]:
         for key, p in sorted(files.items()):  # нестандартные буквы — в конец
             if key not in RU_APPENDIX_ORDER:
                 docs.append(Doc(p, "appendix"))
-    docs.append(Doc(std / "registry" / "terms-draft.md", "terms"))
     docs.append(Doc(std / "Правила оформления и навигации.md", "rules"))
     return [d for d in docs if d.path.exists()]
 
@@ -165,7 +164,7 @@ def cmd_anchors(root: Path, dry: bool = False) -> None:
                 anchor = None  # каноническое определение — в Стандарте
             if anchor and not ANCHOR_FORMAT.match(anchor):
                 anchor = None
-            if not anchor and doc.role == "terms" and line.startswith("| T-"):
+            if not anchor and line.startswith("| T-"):
                 tm = re.match(r"\|\s*(T-\d{3})\s*\|", line)
                 anchor = tm.group(1) if tm else None
             if not anchor:

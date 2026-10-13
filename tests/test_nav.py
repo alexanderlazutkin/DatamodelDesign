@@ -51,7 +51,14 @@ def make_kit(root: Path) -> None:
         "\n"
         "LDM-040 снова — первое упоминание в новом разделе, T-001 тоже.\n"
         "\n"
-        "Текст перед определением в середине абзаца: **GEN-005 (обязательное).** Формулировка.\n",
+        "Текст перед определением в середине абзаца: **GEN-005 (обязательное).** Формулировка.\n"
+        "\n"
+        "## 3. Термины\n"
+        "\n"
+        "| ID | Термин | Область | Резюме | Основание |\n"
+        "|---|---|---|---|---|\n"
+        "| T-001 | Домен | ЛМД | Резюме | С04; LDM-027 |\n"
+        "| T-002 | Модель | управление | Резюме | С04 |\n",
         encoding="utf-8",
     )
 
@@ -62,7 +69,7 @@ def make_kit(root: Path) -> None:
         "\n"
         "**CDM-043 (обязательное).** Формулировка, размещённая в регламенте.\n"
         "\n"
-        "Ссылка на LDM-040 стандарта и прил. Г.6.\n",
+        "Ссылка на LDM-040 стандарта и прил. Г.6. Термин T-001 в регламенте.\n",
         encoding="utf-8",
     )
 
@@ -155,7 +162,7 @@ class NavFixtureTest(unittest.TestCase):
     def test_anchor_term_row(self):
         self.assertIn(
             "| T-001 | Домен | ЛМД | Резюме | С04; LDM-027 ^T-001 |",
-            self.read("registry/terms-draft.md"),
+            self.read("Стандарт.md"),
         )
 
     def test_anchor_pr_card(self):
@@ -202,7 +209,7 @@ class NavFixtureTest(unittest.TestCase):
         self.assertEqual(text.count("прил. И.4]]"), 1)  # повтор в разделе — плоский
 
     def test_cross_file_term_link(self):
-        self.assertIn("[[terms-draft#^T-001|T-001]]", self.read("Стандарт.md"))
+        self.assertIn("[[Стандарт#^T-001|T-001]]", self.read("Регламент AS-IS.md"))
 
     def test_pr_self_definition_not_linked(self):
         text = self.read("appendices/Ж Контрольные листы и процедуры приёмки.md")
@@ -256,12 +263,16 @@ class GuardNormalizeTest(unittest.TestCase):
         cls.nav = load_module()
 
     def test_padding_collapsed(self):
-        a = self.nav.normalize_md("| Ячейка        | Значение   |\n| текст         | ещё        |")
+        a = self.nav.normalize_md(
+            "| Ячейка        | Значение   |\n| текст         | ещё        |"
+        )
         b = self.nav.normalize_md("| Ячейка | Значение |\n| текст | ещё |")
         self.assertEqual(a, b)
 
     def test_separator_canonicalized(self):
-        a = self.nav.normalize_md("| Реквизит | Значение |\n| -------------------------- | --------- |\n| a | b |")
+        a = self.nav.normalize_md(
+            "| Реквизит | Значение |\n| -------------------------- | --------- |\n| a | b |"
+        )
         b = self.nav.normalize_md("| Реквизит | Значение |\n|---|---|\n| a | b |")
         self.assertEqual(a, b)
 
@@ -286,7 +297,8 @@ class GuardNormalizeTest(unittest.TestCase):
 
 
 @unittest.skipUnless(
-    __import__("subprocess").run(["git", "--version"], capture_output=True).returncode == 0,
+    __import__("subprocess").run(["git", "--version"], capture_output=True).returncode
+    == 0,
     "git недоступен",
 )
 class GuardRepoTest(unittest.TestCase):
@@ -303,11 +315,24 @@ class GuardRepoTest(unittest.TestCase):
         subprocess.run(["git", "init", "-q"], cwd=cls.root, check=True)
         subprocess.run(
             ["git", "add", "wrk"],
-            cwd=cls.root, check=True, capture_output=True,
+            cwd=cls.root,
+            check=True,
+            capture_output=True,
         )
         subprocess.run(
-            ["git", "-c", "user.email=t@t", "-c", "user.name=t", "commit", "-qm", "kit"],
-            cwd=cls.root, check=True, capture_output=True,
+            [
+                "git",
+                "-c",
+                "user.email=t@t",
+                "-c",
+                "user.name=t",
+                "commit",
+                "-qm",
+                "kit",
+            ],
+            cwd=cls.root,
+            check=True,
+            capture_output=True,
         )
 
     @classmethod
@@ -320,12 +345,21 @@ class GuardRepoTest(unittest.TestCase):
         f = self.root / "wrk" / "standard" / "Стандарт.md"
         original = f.read_text(encoding="utf-8")
         f.write_text(
-            original.replace("| Колонка | Значение |", "| Колонка          | Значение |")
-                      .replace("|---|---|", "| ------------- | --------- |"),
+            original.replace(
+                "| Колонка | Значение |", "| Колонка          | Значение |"
+            ).replace("|---|---|", "| ------------- | --------- |"),
             encoding="utf-8",
         )
         rc = self.nav.cmd_guard(self.root)
-        self.assertEqual(subprocess.run(["git", "-C", str(self.root), "status", "--porcelain", "wrk"], capture_output=True).stdout.decode().strip(), "")
+        self.assertEqual(
+            subprocess.run(
+                ["git", "-C", str(self.root), "status", "--porcelain", "wrk"],
+                capture_output=True,
+            )
+            .stdout.decode()
+            .strip(),
+            "",
+        )
         self.assertEqual(f.read_text(encoding="utf-8"), original)
         self.assertEqual(rc, 0)
 
@@ -333,7 +367,10 @@ class GuardRepoTest(unittest.TestCase):
         f = self.root / "wrk" / "standard" / "Стандарт.md"
         original = f.read_text(encoding="utf-8")
         try:
-            f.write_text(original.replace("Второй раздел", "Второй раздел (правка)"), encoding="utf-8")
+            f.write_text(
+                original.replace("Второй раздел", "Второй раздел (правка)"),
+                encoding="utf-8",
+            )
             rc = self.nav.cmd_guard(self.root)
             self.assertEqual(rc, 1)  # содержательное изменение осталось
             self.assertIn("(правка)", f.read_text(encoding="utf-8"))
