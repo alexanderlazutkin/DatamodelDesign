@@ -30,8 +30,8 @@ def make_kit(root: Path) -> None:
     app.mkdir(parents=True)
     reg.mkdir(parents=True)
 
-    (std / "Стандарт.md").write_text(
-        "# Стандарт\n"
+    (std / "Правила.md").write_text(
+        "# Правила\n"
         "\n"
         "## 1. Первый раздел\n"
         "\n"
@@ -69,7 +69,7 @@ def make_kit(root: Path) -> None:
         "\n"
         "**CDM-043 (обязательное).** Формулировка, размещённая в регламенте.\n"
         "\n"
-        "Ссылка на LDM-040 стандарта и прил. Г.6. Термин T-001 в регламенте.\n",
+        "Ссылка на LDM-040 правил и прил. Г.6. Термин T-001 в регламенте.\n",
         encoding="utf-8",
     )
 
@@ -144,14 +144,14 @@ class NavFixtureTest(unittest.TestCase):
 
     def test_definition_line_not_linked(self):
         line = [
-            l for l in self.read("Стандарт.md").splitlines() if l.endswith("^LDM-041")
+            l for l in self.read("Правила.md").splitlines() if l.endswith("^LDM-041")
         ][0]
         self.assertNotIn("[[", line)  # дословность: строка-определение без ссылок
 
     def test_anchor_requirement_paragraph(self):
         self.assertIn(
             "**LDM-040 (обязательное).** Формулировка требования. ^LDM-040",
-            self.read("Стандарт.md"),
+            self.read("Правила.md"),
         )
 
     def test_anchor_requirement_in_regulation(self):
@@ -162,7 +162,7 @@ class NavFixtureTest(unittest.TestCase):
     def test_anchor_term_row(self):
         self.assertIn(
             "| T-001 | Домен | ЛМД | Резюме | С04; LDM-027 ^T-001 |",
-            self.read("Стандарт.md"),
+            self.read("Правила.md"),
         )
 
     def test_anchor_pr_card(self):
@@ -172,44 +172,44 @@ class NavFixtureTest(unittest.TestCase):
         )
 
     def test_anchor_inline_definition(self):
-        self.assertIn("Формулировка. ^GEN-005", self.read("Стандарт.md"))
+        self.assertIn("Формулировка. ^GEN-005", self.read("Правила.md"))
 
     def test_anchors_idempotent(self):
-        before = self.read("Стандарт.md")
+        before = self.read("Правила.md")
         self.nav.cmd_anchors(self.root)
-        self.assertEqual(before, self.read("Стандарт.md"))
+        self.assertEqual(before, self.read("Правила.md"))
 
     # ---------- linkify ----------
 
     def test_first_mention_linked_repeat_plain(self):
-        text = self.read("Стандарт.md")
+        text = self.read("Правила.md")
         self.assertEqual(
-            text.count("[[Стандарт#^LDM-040|LDM-040]]"), 2
+            text.count("[[Правила#^LDM-040|LDM-040]]"), 2
         )  # разделы 1 и 2
 
     def test_slash_enum_not_linked(self):
-        self.assertNotIn("|CDM-043", self.read("Стандарт.md").split("## 2.")[0])
-        self.assertIn("CDM-043/LDM-039", self.read("Стандарт.md"))
+        self.assertNotIn("|CDM-043", self.read("Правила.md").split("## 2.")[0])
+        self.assertIn("CDM-043/LDM-039", self.read("Правила.md"))
 
     def test_range_not_linked(self):
-        self.assertIn("LDM-040…046", self.read("Стандарт.md"))
+        self.assertIn("LDM-040…046", self.read("Правила.md"))
 
     def test_table_not_linked(self):
-        self.assertIn("| LDM-040 в таблице | не линкуется |", self.read("Стандарт.md"))
+        self.assertIn("| LDM-040 в таблице | не линкуется |", self.read("Правила.md"))
 
     def test_appendix_point_link(self):
         self.assertIn(
             "[[И Профиль классификации ИОД#И.4. Минимальный объём для пилота|прил. И.4]]",
-            self.read("Стандарт.md"),
+            self.read("Правила.md"),
         )
 
     def test_appendix_doc_link_and_density(self):
-        text = self.read("Стандарт.md")
+        text = self.read("Правила.md")
         self.assertIn("[[Ж Контрольные листы и процедуры приёмки|прил. Ж]]", text)
         self.assertEqual(text.count("прил. И.4]]"), 1)  # повтор в разделе — плоский
 
     def test_cross_file_term_link(self):
-        self.assertIn("[[Стандарт#^T-001|T-001]]", self.read("Регламент AS-IS.md"))
+        self.assertIn("[[Правила#^T-001|T-001]]", self.read("Регламент AS-IS.md"))
 
     def test_pr_self_definition_not_linked(self):
         text = self.read("appendices/Ж Контрольные листы и процедуры приёмки.md")
@@ -221,7 +221,7 @@ class NavFixtureTest(unittest.TestCase):
 
     def test_regulation_links_to_standard(self):
         text = self.read("Регламент AS-IS.md")
-        self.assertIn("[[Стандарт#^LDM-040|LDM-040]]", text)
+        self.assertIn("[[Правила#^LDM-040|LDM-040]]", text)
         self.assertIn("[[Г Минимальные метаданные#Г.6. Свидетельства|прил. Г.6]]", text)
 
     # ---------- check ----------
@@ -231,7 +231,7 @@ class NavFixtureTest(unittest.TestCase):
         self.assertEqual(errors, [])
 
     def test_check_broken_link(self):
-        std = self.root / "wrk" / "standard" / "Стандарт.md"
+        std = self.root / "wrk" / "standard" / "Правила.md"
         original = std.read_text(encoding="utf-8")
         std.write_text(original.replace("#^LDM-040|", "#^LDM-999|"), encoding="utf-8")
         try:
@@ -342,7 +342,7 @@ class GuardRepoTest(unittest.TestCase):
     def test_artifact_reverted(self):
         import subprocess
 
-        f = self.root / "wrk" / "standard" / "Стандарт.md"
+        f = self.root / "wrk" / "standard" / "Правила.md"
         original = f.read_text(encoding="utf-8")
         f.write_text(
             original.replace(
@@ -364,7 +364,7 @@ class GuardRepoTest(unittest.TestCase):
         self.assertEqual(rc, 0)
 
     def test_content_change_kept(self):
-        f = self.root / "wrk" / "standard" / "Стандарт.md"
+        f = self.root / "wrk" / "standard" / "Правила.md"
         original = f.read_text(encoding="utf-8")
         try:
             f.write_text(

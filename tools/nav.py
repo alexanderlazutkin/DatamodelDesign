@@ -84,10 +84,10 @@ class Doc:
 
 
 def kit_docs(root: Path) -> list[Doc]:
-    """Упорядоченный комплект: Стандарт, Регламент, прил. А…Ф, словарь, правила."""
+    """Упорядоченный комплект: Правила, Регламент, прил. А…Ф, словарь, правила."""
     std = root / "wrk" / "standard"
     docs = [
-        Doc(std / "Стандарт.md", "standard"),
+        Doc(std / "Правила.md", "standard"),
         Doc(std / "Регламент AS-IS.md", "regulation"),
     ]
     app_dir = std / "appendices"
@@ -161,7 +161,7 @@ def cmd_anchors(root: Path, dry: bool = False) -> None:
                         f"{sorted(inline)} — пропущено"
                     )
             if anchor and doc.role == "regulation" and anchor in anchored_in_standard:
-                anchor = None  # каноническое определение — в Стандарте
+                anchor = None  # каноническое определение — в Правилах
             if anchor and not ANCHOR_FORMAT.match(anchor):
                 anchor = None
             if not anchor and line.startswith("| T-"):
@@ -200,7 +200,7 @@ def trailing_newline(original: str) -> str:
 def build_targets(docs: list[Doc]) -> dict[str, tuple[str, str]]:
     """ID -> (имя файла для wikilink, якорь ^id) по фактическим block-ID."""
     targets: dict[str, tuple[str, str]] = {}
-    for doc in docs:  # Стандарт раньше Регламента — канонические цели приоритетны
+    for doc in docs:  # Правила раньше Регламента — канонические цели приоритетны
         for bid in sorted(doc.block_ids):
             targets.setdefault(bid, (doc.stem, f"^{bid}"))
     return targets

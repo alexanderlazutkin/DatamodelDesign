@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """tools/build_docx.py — единый .docx нормативного комплекта со сквозной навигацией (Р-041).
 
-Сборка: титул → содержание → Стандарт (со словарём терминов в 2.1) → Регламент AS-IS →
+Сборка: титул → содержание → Правила (со словарём терминов в 2.1) → Регламент AS-IS →
 приложения А…Ф. Каждая wikilink-цель (заголовок, block-ID) получает закладку Word; ссылки
 становятся внутренними гиперссылками (Ctrl+клик). Диаграммы ```mermaid отрисовываются в PNG
 (mermaid-cli, кэш wrk/tmp/mermaid-cache) и вставляются картинками; при сбое рендера
@@ -10,8 +10,8 @@
 имеет закладку.
 
 Запуск:
-  uv run --with python-docx python tools/build_docx.py --out dist/Комплект_стандарта.docx
-  uv run --with python-docx python tools/build_docx.py --verify dist/Комплект_стандарта.docx
+  uv run --with python-docx python tools/build_docx.py --out dist/Комплект_правил.docx
+  uv run --with python-docx python tools/build_docx.py --verify dist/Комплект_правил.docx
 """
 
 from __future__ import annotations
@@ -280,7 +280,7 @@ def parse_md(text: str) -> list[Block]:
 def kit_docs(root: Path) -> list[DocKit]:
     std = root / "wrk" / "standard"
     plan = [
-        (std / "Стандарт.md", "std"),
+        (std / "Правила.md", "std"),
         (std / "Регламент AS-IS.md", "reg"),
     ]
     app_dir = std / "appendices"
@@ -712,10 +712,10 @@ def verify_docx(path: Path) -> list[str]:
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--root", type=Path, default=Path(__file__).resolve().parents[1])
-    ap.add_argument("--out", type=Path, default=Path("dist/Комплект_стандарта.docx"))
+    ap.add_argument("--out", type=Path, default=Path("dist/Комплект_правил.docx"))
     ap.add_argument(
         "--title",
-        default="Корпоративный стандарт проектирования моделей данных (КМД и ЛМД) — нормативный комплект",
+        default="Корпоративные правила проектирования моделей данных (КМД и ЛМД) — нормативный комплект",
     )
     ap.add_argument("--version", default="0.8-д7.6 (рабочая редакция)")
     ap.add_argument("--verify", type=Path, metavar="DOCX")

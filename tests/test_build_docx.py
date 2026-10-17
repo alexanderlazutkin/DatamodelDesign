@@ -53,7 +53,7 @@ class BuildDocxTest(unittest.TestCase):
         cls.nav.cmd_anchors(cls.root)
         cls.nav.cmd_linkify(cls.root)
         # дополнения: код-блок, список, цитата, внешняя ссылка
-        std = cls.root / "wrk" / "standard" / "Стандарт.md"
+        std = cls.root / "wrk" / "standard" / "Правила.md"
         std.write_text(
             std.read_text(encoding="utf-8")
             + "\n```\ncode LDM-040 fence\n```\n"
@@ -114,7 +114,7 @@ class BuildDocxTest(unittest.TestCase):
     def test_toc_links_to_docs(self):
         text = "\n".join(p.text for p in Document(str(self.out)).paragraphs)
         self.assertIn("Содержание", text)
-        self.assertIn("Стандарт", text)
+        self.assertIn("Правила", text)
 
 
 def _png_1px() -> bytes:
@@ -149,7 +149,7 @@ class MermaidDocxTest(unittest.TestCase):
         cls.nav = load_nav()
         cls.root = Path(cls.tmp.name)
         make_kit(cls.root)
-        std = cls.root / "wrk" / "standard" / "Стандарт.md"
+        std = cls.root / "wrk" / "standard" / "Правила.md"
         std.write_text(
             std.read_text(encoding="utf-8")
             + "\n```mermaid\nerDiagram\n    A ||--o{ B : содержит\n```\n",
@@ -195,7 +195,7 @@ class MermaidFallbackTest(unittest.TestCase):
         cls.nav = load_nav()
         cls.root = Path(cls.tmp.name)
         make_kit(cls.root)
-        std = cls.root / "wrk" / "standard" / "Стандарт.md"
+        std = cls.root / "wrk" / "standard" / "Правила.md"
         std.write_text(
             std.read_text(encoding="utf-8")
             + "\n```mermaid\nerDiagram\n    A ||--o{ B : содержит\n```\n",
